@@ -15,7 +15,7 @@ def login():  # put application's code here
     url = "https://api-production.data.gov.sg/v2/public/api/collections/{}/metadata".format(collectionId)
     response = requests.get(url)
     print(response.json())
-    return render_template('base.html', title='base')
+    return render_template('index.html', title='index')
 
 
 if __name__ == '__main__':
