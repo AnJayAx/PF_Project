@@ -1,0 +1,67 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/2.1.6/css/dataTables.dataTables.css" />
+<script src="https://cdn.datatables.net/2.1.6/js/dataTables.js"></script>
+
+
+{% extends "base.html" %}
+
+{% block title %}HDB Haven - Search{% endblock %}
+
+{% block content %}
+    <div class="az-content pd-y-20 pd-lg-y-30 pd-xl-y-40">
+      <div class="container">
+        <div class="az-content-body pd-lg-l-40 d-flex flex-column">
+          <h2 class="az-content-title">Comprehensive HDB Data</h2>
+          <div class="az-content-label mg-b-5">Select your filters.</div>
+          <p class="mg-b-20">Search for data on the exact HDB you what you want.</p>
+
+          <div class="table-responsive">
+            <table id="main-table" class="table table-hover table-bordered mg-b-0" style="height:500px; display: inline-block; overflow: auto;">
+              <thead>
+                <tr>
+                  <th style="position: sticky; top: 0; background-color: white;">Month</th>
+                  <th style="position: sticky; top: 0; background-color: white;">Town</th>
+                  <th style="position: sticky; top: 0; background-color: white;">Flat Type</th>
+                  <th style="position: sticky; top: 0; background-color: white;">Block</th>
+                  <th style="position: sticky; top: 0; background-color: white;">Street Name</th>
+                  <th style="position: sticky; top: 0; background-color: white;">Storey Range</th>
+                  <th style="position: sticky; top: 0; background-color: white;">Floor Area</th>
+                  <th style="position: sticky; top: 0; background-color: white;">Flat Model</th>
+                  <th style="position: sticky; top: 0; background-color: white;">Lease Commence Date</th>
+                  <th style="position: sticky; top: 0; background-color: white;">Resale Price</th>
+                  <th style="position: sticky; top: 0; background-color: white;">Price per Square Metre</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in rows %}
+                <tr>
+                    <td>{{ records[i]["month"] }}</td>
+                    <td>{{ records[i]["town"] }}</td>
+                    <td>{{ records[i]["flat_type"] }}</td>
+                    <td>{{ records[i]["block"] }}</td>
+                    <td>{{ records[i]["street_name"] }}</td>
+                    <td>{{ records[i]["storey_range"] }}</td>
+                    <td>{{ records[i]["floor_area_sqm"] }}</td>
+                    <td>{{ records[i]["flat_model"] }}</td>
+                    <td>{{ records[i]["lease_commence_date"] }}</td>
+                    <td>{{ records[i]["resale_price"] }}</td>
+                    <td>{{ records[i]["price_per_sq_metre"] }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div><!-- table-responsive -->
+
+          <div class="ht-40"></div>
+
+        </div><!-- az-content-body -->
+      </div><!-- container -->
+    </div><!-- az-content -->
+
+    <script>
+        let table = new DataTable('#main-table', {
+            // config options...
+        });
+    </script>
+{% endblock %}
