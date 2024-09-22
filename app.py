@@ -1,6 +1,8 @@
 from flask import Flask, render_template
 from flask import Flask, render_template, request, redirect
 import requests
+import locale
+locale.setlocale( locale.LC_ALL, '' )
 
 app = Flask(__name__)
 
@@ -47,9 +49,12 @@ def search_hdb():
     # Self-calculate Price per Sq Metre and insert into the records.
     for i in records:
         i["price_per_sq_metre"] = str(round(float(i["resale_price"]) / float(i["floor_area_sqm"]), 2))
+        i["f_resale_price"] = locale.currency(float(i["resale_price"]), grouping=True)
+        i["f_price_per_sq_metre"] = locale.currency(float(i["price_per_sq_metre"]), grouping=True)
     #print(records)
     print("-------------------------------")
     rows = range(len(records))
+    
     # Filters required: 
     # (DateTimePicker) - Date Range from Start to End, 
     # (Range Slider) - Price Range, 
@@ -58,7 +63,8 @@ def search_hdb():
     # RMB TO-DO:
     # how to do a buncha api calls asynchronously... talking about tens of thousands of rows of data
     # may be better to download and store ALL the data in csvs and only api call for the most updated stuff via offset.
- 
+    # hover over table headers to see what they mean
+    # responsivity of the table could be better
     return render_template('search-hdb.html', title='index', rows = rows, records = records)
 
 if __name__ == '__main__':
