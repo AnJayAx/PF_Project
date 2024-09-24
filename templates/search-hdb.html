@@ -11,29 +11,42 @@
           <div class="az-content-label mg-b-5">Select your filters.</div>
           <p class="mg-b-20">Search for data on the exact HDB you what you want.</p>
 
-          <!-- <div class="wd-200 mg-b-20">
+          <div class="wd-200 mg-b-20">
             <div class="input-group">
               <div class="input-group-prepend">
                 <div class="input-group-text">
-                  <i class="typcn typcn-calendar-outline tx-24 lh--9 op-6"></i>
+                  From
                 </div>
               </div>
               <input type="text" class="form-control fc-datepicker" placeholder="MM/DD/YYYY">
             </div>
+          </div>
+          <div class="wd-200 mg-b-20">
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <div class="input-group-text">
+                  To
+                </div>
+              </div>
+              <input type="text" class="form-control fc-datepicker" placeholder="MM/DD/YYYY">
+            </div>
+          </div>
+          <!-- <div class="wd-200 mg-b-20">
+            <label for="startDate">Date :</label>
+            <input name="startDate" id="startDate" class="date-picker" />
           </div> -->
- 
           <div class="table-responsive">
             <table id="main-table" class="" style="display: inline-block; overflow: auto;">
               <thead>
                 <tr>
                   <th style="position: sticky; top: 0; background-color: white;">Month</th>
-                  <th style="position: sticky; top: 0; background-color: white;">Town</th>
+                  <th data-dt-order="disable" style="position: sticky; top: 0; background-color: white;">Town</th>
                   <th style="position: sticky; top: 0; background-color: white;">Flat Type</th>
-                  <th style="position: sticky; top: 0; background-color: white;">Floor Area</th>
+                  <th style="position: sticky; top: 0; background-color: white;">Floor Area (m<sup>2</sup>)</th>
                   <th style="position: sticky; top: 0; background-color: white;">Resale Price</th>
                   <th style="position: sticky; top: 0; background-color: white;">$ / m<sup>2</sup></th>
-                  <th style="position: sticky; top: 0; background-color: white;">Street Name</th>
-                  <th style="position: sticky; top: 0; background-color: white;">Block</th>
+                  <th data-dt-order="disable" style="position: sticky; top: 0; background-color: white;">Street Name</th>
+                  <th data-dt-order="disable" style="position: sticky; top: 0; background-color: white;">Block</th>
                   <th style="position: sticky; top: 0; background-color: white;">Storey Range</th>
                   <!-- <th style="position: sticky; top: 0; background-color: white;">Flat Model</th> -->
                   <th style="position: sticky; top: 0; background-color: white;">Lease Commence Date</th>
@@ -45,7 +58,7 @@
                     <td>{{ records[i]["month"] }}</td>
                     <td>{{ records[i]["town"] }}</td>
                     <td>{{ records[i]["flat_type"] }}</td>
-                    <td value={{ records[i]["floor_area_sqm"] }}>{{ records[i]["floor_area_sqm"] }} m<sup>2</sup> </td>
+                    <td value={{ records[i]["floor_area_sqm"] }}>{{ records[i]["floor_area_sqm"] }}</td>
                     <!-- <td hidden>{{ records[i]["resale_price"] }}</td> -->
                     <td class="currency" value={{ records[i]["resale_price"] }}>{{ records[i]["f_resale_price"] }}</td>
                     <!-- <td hidden>{{ records[i]["price_per_sq_metre"] }}</td> -->
@@ -69,13 +82,25 @@
 
     <script>
         let table = new DataTable('#main-table', {
-           
+          
         });
 
         // Datepicker
         $('.fc-datepicker').datepicker({
           showOtherMonths: true,
-          selectOtherMonths: true
+          selectOtherMonths: true,
+          changeMonth: true, 
+          changeYear: true,
+          showButtonPanel: true,
+          dateFormat: 'MM yy',
+          onClose: function(dateText, inst) { 
+            $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
+        }
         });
     </script>
+    <style>
+      .ui-datepicker-calendar {
+        display: none;
+      }
+    </style>
 {% endblock %}
