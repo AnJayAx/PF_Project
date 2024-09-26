@@ -9,8 +9,10 @@ from uuid import uuid4
 import pandas as pd
 import os
 from datetime import datetime
-
+import threading
 locale.setlocale(locale.LC_ALL, '')
+import time
+
 
 app = Flask(__name__)
 
@@ -40,6 +42,63 @@ login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
 
+# Table data in memory
+table_data_chunks = []
+
+def fetch_data_from_api():
+    completeAPICall = False
+    global table_data_chunks
+    local_data_chunks = []
+    base_url = "https://data.gov.sg"
+    first_api_res = "/api/action/datastore_search?resource_id=d_8b84c4ee58e3cfc0ece0d773c8ca6abc"
+    hdb_api = base_url + first_api_res
+
+    start = time.time()
+    while not completeAPICall:
+        response = requests.get(hdb_api)
+        if response.status_code == 200:
+            data = response.json()
+            records = data["result"]["records"]
+
+            for j in records:
+                j["price_per_sq_metre"] = str(round(float(j["resale_price"]) / float(j["floor_area_sqm"]), 2))
+                j["f_resale_price"] = locale.currency(float(j["resale_price"]), grouping=True)
+                j["f_price_per_sq_metre"] = locale.currency(float(j["price_per_sq_metre"]), grouping=True)
+
+            # Chunk data into groups of 10
+            chunk_size = 10
+            for i in range(0, len(records), chunk_size):
+                local_data_chunks = [records[i:i + chunk_size]]
+                local_data_chunks.reverse()
+
+            try:
+                if (data["result"]["total"] - data["result"]["offset"]) <= 100:
+                    completeAPICall = True
+                    end = time.time()
+                    time_taken = (end - start) / 60
+
+                    print("Loop End ++++++")
+                    print("Time Taken for full API call: " + str(time_taken))
+            except:
+                print("Fetching data from API...")
+                pass
+
+            hdb_api = base_url + data["result"]["_links"]["next"]
+            table_data_chunks.insert(0, local_data_chunks)
+
+        else:
+            print('Failed to fetch data from API')
+            break
+
+def fetch_data_async():
+    fetch_data_from_api()
+
+@app.before_request
+def startup():
+    app.before_request_funcs[None].remove(startup)
+    thread = threading.Thread(target=fetch_data_async)
+    thread.start()
+
 
 @login_manager.user_loader
 def load_user(id):
@@ -53,8 +112,8 @@ def main():  # put application's code here
     # url for hdb resale prices and details
     collectionId = 189
     url = "https://api-production.data.gov.sg/v2/public/api/collections/{}/metadata".format(collectionId)
-    response = requests.get(url)
-    print(response.json())
+    #response = requests.get(url)
+    #print(response.json())
 
     return render_template('index.html', title='index', user=current_user)
 
@@ -149,31 +208,36 @@ def logout():
     logout_user()
     return redirect("login")
 
+@app.route("/get_data", methods=["GET"])
+def get_data():
+    # Get request parameters from Datatables
+    draw = request.args.get('draw')  # For keeping track of requests
+    start = int(request.args.get('start', 0))  # Starting index
+    length = int(request.args.get('length', 10))  # Number of rows per page
+
+    # [ [{1},{2},{3},{4},{5}] , [{1},{2},{3},{4},{5}] ]
+
+    # Data chunking
+    filtered_data = sum(table_data_chunks, [])
+    total_records = len(filtered_data)
+    data_to_send = filtered_data[start:start + length]
+    #print(data_to_send[0])
+    response = {
+        'draw': draw,
+        'recordsTotal': total_records,  # Total number of records
+        'recordsFiltered': total_records,  # Number of records after filtering
+        'data': data_to_send[0]  # Send only the current page's data
+    }
+
+    return jsonify(response)
 
 @app.route('/search-hdb', methods=['GET', 'POST'])
 def search_hdb():
     offsetTesting = "&offset=189600"
-    offset = ""
     datasetId = "d_8b84c4ee58e3cfc0ece0d773c8ca6abc" + offsetTesting
-    url = "https://data.gov.sg/api/action/datastore_search?resource_id=" + datasetId
+    url = "https://data.gov.sg/api/action/datastore_search?resource_id=" + datasetId + offsetTesting
 
     responseJSON = requests.get(url).json()
-    # To iterate through the API datasets:
-    # Each api call will only return 100 rows from the dataset starting from the bottom (2017).
-    # Api calls will return a ["_links"]["next"] obj containing the url to use for the next api call.
-    # The next obj will be offset by the amount you already received, meaning you won't read what you already got.
-    # Loop this until the ["total"] - ["offset"] is < 100 
-    ######################################
-    # completeAPICall = False
-    # while completeAPICall == True:
-    #     responseJSON = requests.get(url).json()
-    #     #print(responseJSON)
-    #     if "offset" in responseJSON["result"]["_links"]:
-    #         if (responseJSON["result"]["total"] - responseJSON["result"]["_links"]["offset"]) > 100:
-    #             url = responseJSON["_links"]["next"]
-    #             print("loop API")
-    #         else:
-    #             completeAPICall = True
 
     print("-------------------------------")
     records = responseJSON["result"]["records"]
@@ -185,18 +249,15 @@ def search_hdb():
     # print(records)
     print("-------------------------------")
     rows = range(len(records))
-
     # Filters required:
     # (DateTimePicker) - Date Range from Start to End, 
     # (Range Slider) - Price Range, 
     # (Single Select Box w/wo Search) - Flat Type(Rooms), Town
     # ---------------------------------------
     # RMB TO-DO:
-    # how to do a buncha api calls asynchronously... talking about tens of thousands of rows of data
-    # may be better to download and store ALL the data in csvs and only api call for the most updated stuff via offset.
     # hover over table headers to see what they mean
     # responsivity of the table could be better
-    return render_template('search-hdb.html', title='index', rows=rows, records=records, user=current_user)
+    return render_template('search-hdb.html', title='index', user=current_user)
 
 # Load the CSV data into a global variable to avoid reloading
 path = os.getcwd()
