@@ -82,7 +82,36 @@
 
     <script>
         let table = new DataTable('#main-table', {
-          
+          ordering: false,
+          "processing": true,
+          "serverSide": true,
+          "ajax": "/get_data",
+          "columns": [
+            // { "data": "_id" },
+            { "data": "month" }, 
+            { "data": "town" },
+            { "data": "flat_type" },
+            { "data": "floor_area_sqm" },
+            { "data": "f_resale_price" },
+            { "data": "f_price_per_sq_metre" },
+            { "data": "street_name" },
+            { "data": "block" },
+            { "data": "storey_range" },
+            { "data": "lease_commence_date" },
+            // { "data": "flat_model" },
+            // { "data": "remaining_lease" },
+          ],
+          columnDefs: [
+            { width: '15%', targets: 1},
+            { width: '10%', targets: 3},
+            { width: '20%', targets: 6},
+            { width: '2%', targets: -1},
+          ],
+          layout: {
+            topStart: null,
+            topEnd: null,
+          },
+    
         });
 
         // Datepicker
