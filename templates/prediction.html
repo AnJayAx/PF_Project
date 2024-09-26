@@ -1,0 +1,377 @@
+{% extends "base.html" %}
+
+{% block title %}HDB Haven - Prediction{% endblock %}
+
+{% block content %}
+    <div class="az-content pd-y-20 pd-lg-y-30 pd-xl-y-40">
+        <div class="container">
+            <div class="az-content-body pd-lg-l-40 d-flex flex-column">
+                <h2 class="az-content-title">Prediction for FUTURE resale price</h2>
+                <div class="az-content-label mg-b-5">Enter and select your targeted address.</div>
+                <p class="mg-b-20">To view the details of the inputted address, select an option from the list below and
+                    click the Predict button.</p>
+
+                <!-- Main container divided into input (yellow) and output (red) sections -->
+                <div class="d-flex justify-content-between flex-wrap">
+                    <!-- Input Section (Yellow Side) -->
+                    <div class="input-section">
+                        <div class="mg-b-20">
+                            <p class="mg-b-10">Targeted Month - Year</p>
+                            <div class="input-group full-width">
+                                <div class="input-group-prepend">
+                                    <div class="input-group-text">
+                                        <i class="typcn typcn-calendar-outline tx-24 lh--9 op-6"></i>
+                                    </div>
+                                </div>
+                                <input type="text" data-date="{{ date.strftime("%m/%y") }}" id="datetimepicker"
+                                       class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="mg-b-20">
+                            <p class="mg-b-10">Town</p>
+                            <select id="town-select" class="form-control select2 full-width">
+                                <option label="Choose a Town"></option>
+                                {% for tn in tn_list %}
+                                    <option value="{{ tn }}">{{ tn }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="mg-b-20">
+                            <p class="mg-b-10">Block</p>
+                            <select id="block-select" class="form-control select2 full-width" disabled>
+                                <option label="Block Number"></option>
+                            </select>
+                        </div>
+
+                        <div class="mg-b-20">
+                            <p class="mg-b-10">Street Name</p>
+                            <select id="street-select" class="form-control select2 full-width" disabled>
+                                <option label="Street Name"></option>
+                            </select>
+                        </div>
+
+                        <div class="mg-b-20">
+                            <p class="mg-b-10">Flat Type</p>
+                            <select id="flat-select" class="form-control select2 full-width" disabled>
+                                <option label="Type of Flat"></option>
+                            </select>
+                        </div>
+
+                        <div class="mg-b-20">
+                            <p class="mg-b-10">Storey Range</p>
+                            <select class="form-control select2-no-search full-width">
+                                <option label="Range depends on individual flats"></option>
+                                <option value="1">Low</option>
+                                <option value="2">Medium</option>
+                                <option value="3">High</option>
+                            </select>
+                        </div>
+
+                        <div class="mg-b-20">
+                            <p class="mg-b-10">Floor Area (sqm)</p>
+                            <input id="floor-area" class="form-control" placeholder="Numbers Only" type="text">
+                        </div>
+
+                        <div class="mg-b-20">
+                            <p class="mg-b-10">Lease Commence Year</p>
+                            <select id="year" class="form-control select2-no-search full-width">
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+
+                        <div class="mg-b-20">
+                            <p class="mg-b-10">Max Floor Level</p>
+                            <select id="floor-select" class="form-control select2 full-width">
+                                <option label="1 - 50 Max"></option>
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+
+                        <!-- Submit button (full width) -->
+                        <button type="button" id="predictButton" class="btn btn-primary submit-btn full-width">Predict
+                        </button>
+                    </div>
+
+                    <!-- Output Section (Red Side) -->
+                    <div class="output-section" id="result-box">
+                        <!-- Empty initially; will be updated dynamically -->
+                        <div id="price-prediction" class="price-prediction">
+                            <!-- Placeholder for the price prediction -->
+                        </div>
+                    </div>
+                </div>
+            </div><!-- az-content-body -->
+        </div><!-- container -->
+    </div><!-- az-content -->
+
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                width: '100%' // Ensure Select2 takes up 100% width
+            });
+
+            $('#town-select').on('change', function () {
+                const selectedTown = $(this).val();
+                console.log('Selected Town:', selectedTown);  // Debugging line
+
+                // Make an AJAX call to get blocks for the selected town
+                fetch(`/get_blocks/${selectedTown}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Blocks received:', data.blocks);  // Debugging line
+                        var blockSelect = $('#block-select');
+                        blockSelect.empty().append('<option label="Choose one"></option>'); // Clear current options
+                        blockSelect.prop('disabled', false); // Enable block dropdown
+
+                        // Populate with new block options
+                        data.blocks.forEach(function (block) {
+                            blockSelect.append(`<option value="${block}">${block}</option>`);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching blocks:', error));
+            });
+
+            $('#block-select').on('change', function () {
+                const selectedBlock = $(this).val();
+                const selectedTown = $('#town-select').val();
+                console.log('Selected Block:', selectedBlock); // Debugging line
+
+                // Fetch street names based on selected town and block
+                fetch(`/get_streets/${selectedTown}/${selectedBlock}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Streets received:', data.streets); // Debugging line
+                        var streetSelect = $('#street-select');
+                        streetSelect.empty().append('<option label="Choose one"></option>'); // Clear current options
+                        streetSelect.prop('disabled', false); // Enable street name dropdown
+
+                        // Populate with new street options
+                        data.streets.forEach(function (street) {
+                            streetSelect.append(`<option value="${street}">${street}</option>`);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching streets:', error));
+            });
+
+            $('#street-select').on('change', function () {
+                const selectedStreet = $(this).val();
+                const selectedBlock = $('#block-select').val();
+                console.log('Selected Street:', selectedStreet); // Debugging line
+
+                // Fetch flat types based on selected street and block
+                fetch(`/get_flats/${selectedBlock}/${selectedStreet}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Flat types received:', data.flat_types); // Debugging line
+                        var flatSelect = $('#flat-select');
+                        flatSelect.empty().append('<option label="Choose one"></option>'); // Clear current options
+                        flatSelect.prop('disabled', false); // Enable flat type dropdown
+
+                        // Populate with new flat type options
+                        data.flat_types.forEach(function (flat_type) {
+                            flatSelect.append(`<option value="${flat_type}">${flat_type}</option>`);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching flat types:', error));
+            });
+        });
+    </script>
+    <script>
+        // Additional code for adding placeholder in search box of select2
+        (function ($) {
+            var Defaults = $.fn.select2.amd.require('select2/defaults');
+
+            $.extend(Defaults.defaults, {
+                searchInputPlaceholder: ''
+            });
+
+            var SearchDropdown = $.fn.select2.amd.require('select2/dropdown/search');
+
+            var _renderSearchDropdown = SearchDropdown.prototype.render;
+
+            SearchDropdown.prototype.render = function (decorated) {
+
+                // invoke parent method
+                var $rendered = _renderSearchDropdown.apply(this, Array.prototype.slice.apply(arguments));
+
+                this.$search.attr('placeholder', this.options.get('searchInputPlaceholder'));
+
+                return $rendered;
+            };
+
+        })(window.jQuery);
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Initialize Select2 for elements with or without search
+            $('.select2').select2({
+                placeholder: 'Choose one',
+                searchInputPlaceholder: 'Search',
+                width: '100%' // Ensure Select2 takes up 100% width
+            });
+
+            $('.select2-no-search').select2({
+                minimumResultsForSearch: Infinity,
+                placeholder: 'Choose one',
+                width: '100%' // Ensure Select2 takes up 100% width
+            });
+
+            // Initialize datepicker with month and year only
+            const myDate = $("#datetimepicker").attr('data-date');
+            $('#datetimepicker').datepicker({
+                dateFormat: 'MM yy', // Show only month and year
+                changeMonth: true,   // Enable month dropdown
+                changeYear: true,    // Enable year dropdown
+                showButtonPanel: true, // Show Today and Done buttons
+                autoclose: true,
+                minDate: 0,
+                onClose: function (dateText, inst) {
+                    const month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    const year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    $(this).datepicker('setDate', new Date(year, month, 1)); // Set the chosen date
+                },
+                beforeShow: function (input, inst) {
+                    $(inst.dpDiv).addClass('month-year-picker'); // Add custom class
+                }
+            });
+
+            // Set the initial date
+            $('#datetimepicker').datepicker('setDate', myDate);
+
+            // Populate the Lease Commence Year dropdown
+            var currentYear = new Date().getFullYear() - 4; // Set the year, excluding the most recent 4 years
+            var minYear = currentYear - 1960; // Adjust to determine the oldest year allowed
+
+            // Loop through years up to the year before the current year
+            for (var year = currentYear - minYear; year < currentYear; year++) {
+                var option = document.createElement("option");
+                option.text = year;
+                option.value = year;
+                document.getElementById("year").appendChild(option);
+            }
+
+            // Optionally, set the default value to the most recent year available
+            document.getElementById("year").value = currentYear - 1;
+
+            // Populate the Max Floor Level dropdown with options from 1 to 50
+            for (var i = 1; i <= 50; i++) {
+                $('#floor-select').append(new Option(i, i));
+            }
+
+            document.getElementById('floor-area').addEventListener('input', function (e) {
+                // Remove any non-digit characters from the input
+                this.value = this.value.replace(/\D/g, '');
+            });
+        });
+    </script>
+
+    <style>
+        .d-flex {
+            display: flex;
+        }
+
+        .justify-content-between {
+            justify-content: space-between;
+        }
+
+        .input-section {
+            width: 49%; /* Input section takes slightly less than half of the width */
+        }
+
+        .output-section {
+            width: 49%; /* Output section also takes slightly less than half of the width */
+            text-align: center;
+        }
+
+        /* Make input fields and button stretch to full width */
+        .full-width {
+            width: 100%;
+        }
+
+        /* Submit button styling */
+        .submit-btn {
+            height: 40px;
+        }
+
+        /* Output section text styling */
+        .price-prediction {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Reduced gap between input and output sections */
+        .d-flex {
+            gap: 10px; /* Small gap between the two sections */
+        }
+
+        /* Hide the calendar */
+        .ui-datepicker-calendar {
+            display: none;
+        }
+
+        /* General datepicker style */
+        .month-year-picker {
+            width: auto;
+            padding: 10px;
+        }
+
+        /* Styling for the dropdowns */
+        .ui-datepicker .ui-datepicker-title {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px; /* Space between dropdowns */
+        }
+
+        /* Styling for the previous and next arrows */
+        .ui-datepicker .ui-datepicker-prev,
+        .ui-datepicker .ui-datepicker-next {
+            top: 0; /* Align arrows vertically with the dropdowns */
+            width: 20px;
+            height: 20px;
+            margin: 0 10px; /* Space between the arrows and dropdowns */
+        }
+
+        .ui-datepicker-prev {
+            left: 10px;
+        }
+
+        .ui-datepicker-next {
+            right: 10px;
+        }
+
+        /* Dropdowns padding */
+        .ui-datepicker .ui-datepicker-title select {
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        /* Adjust Done and Today button layout */
+        .ui-datepicker-buttonpane {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .ui-datepicker-buttonpane button {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: none;
+            font-size: 14px;
+            margin: 0 5px;
+            cursor: pointer;
+        }
+
+        .ui-datepicker-buttonpane button:hover {
+            background-color: #0056b3;
+        }
+
+    </style>
+
+{% endblock %}

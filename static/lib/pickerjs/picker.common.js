@@ -900,6 +900,7 @@ var helpers = {
 
     switch (token.charAt(0)) {
       case 'Y':
+          const currentYear = new Date().getFullYear();
         if (isNumber(value)) {
           date.setFullYear(token.length === 2 ? 2000 + value : value);
 

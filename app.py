@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, flash
+from flask import Flask, render_template, request, redirect, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, login_required, logout_user, current_user, LoginManager
 import requests
@@ -6,9 +6,11 @@ import locale
 import re
 from werkzeug.security import generate_password_hash, check_password_hash
 from uuid import uuid4
+import pandas as pd
+import os
+from datetime import datetime
+
 locale.setlocale(locale.LC_ALL, '')
-
-
 
 app = Flask(__name__)
 
@@ -195,6 +197,31 @@ def search_hdb():
     # hover over table headers to see what they mean
     # responsivity of the table could be better
     return render_template('search-hdb.html', title='index', rows=rows, records=records, user=current_user)
+
+# Load the CSV data into a global variable to avoid reloading
+path = os.getcwd()
+df = pd.read_csv(path + '/static/csv/ResaleFlatPrices.csv')
+
+@app.route('/predict', methods=['GET'])
+def prediction():
+    date = datetime.now()
+    tn_list = df['town'].unique().tolist()  # List of unique towns
+    return render_template('prediction.html', user=current_user, tn_list=tn_list, date=date)
+
+@app.route('/get_blocks/<town>', methods=['GET'])
+def get_blocks(town):
+    blocks = df[df['town'] == town]['block'].unique().tolist()  # Get unique blocks for the selected town
+    return jsonify({'blocks': blocks})
+
+@app.route('/get_streets/<town>/<block>', methods=['GET'])
+def get_streets(town, block):
+    streets = df[(df['town'] == town) & (df['block'] == block)]['street_name'].unique().tolist()
+    return jsonify({'streets': streets})
+
+@app.route('/get_flats/<block>/<street>', methods=['GET'])
+def get_flats(block, street):
+    flat_types = df[(df['block'] == block) & (df['street_name'] == street)]['flat_type'].unique().tolist()
+    return jsonify({'flat_types': flat_types})
 
 
 if __name__ == '__main__':
