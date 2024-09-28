@@ -322,7 +322,7 @@ def convert_to_months_since_base(year_month, base_year=1960):
 
 def predicting(input_dict):
     # Load the models and scalers
-    model = load_model(path + '/static/prediction/resale_model_updated.h5')
+    model = load_model(path + '/static/prediction/resale_model_adjusted.h5')
     label_encoders = joblib.load(path + '/static/prediction/label_encoders.pkl')  # Load label encoders
     scaler_X = joblib.load(path + '/static/prediction/scaler_X.pkl')  # Load feature scaler
     scaler_y = joblib.load(path + '/static/prediction/scaler_y.pkl')  # Load target scaler
