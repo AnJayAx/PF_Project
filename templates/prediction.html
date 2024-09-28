@@ -24,13 +24,13 @@
                                     </div>
                                 </div>
                                 <input type="text" data-date="{{ date.strftime("%m/%y") }}" id="datetimepicker"
-                                       class="form-control">
+                                       class="form-control" required>
                             </div>
                         </div>
 
                         <div class="mg-b-20">
                             <p class="mg-b-10">Town</p>
-                            <select id="town-select" class="form-control select2 full-width">
+                            <select id="town-select" class="form-control select2 full-width" required>
                                 <option label="Choose a Town"></option>
                                 {% for tn in tn_list %}
                                     <option value="{{ tn }}">{{ tn }}</option>
@@ -40,28 +40,28 @@
 
                         <div class="mg-b-20">
                             <p class="mg-b-10">Block</p>
-                            <select id="block-select" class="form-control select2 full-width" disabled>
+                            <select id="block-select" class="form-control select2 full-width" disabled required>
                                 <option label="Block Number"></option>
                             </select>
                         </div>
 
                         <div class="mg-b-20">
                             <p class="mg-b-10">Street Name</p>
-                            <select id="street-select" class="form-control select2 full-width" disabled>
+                            <select id="street-select" class="form-control select2 full-width" disabled required>
                                 <option label="Street Name"></option>
                             </select>
                         </div>
 
                         <div class="mg-b-20">
                             <p class="mg-b-10">Flat Type</p>
-                            <select id="flat-select" class="form-control select2 full-width" disabled>
+                            <select id="flat-select" class="form-control select2 full-width" disabled required>
                                 <option label="Type of Flat"></option>
                             </select>
                         </div>
 
                         <div class="mg-b-20">
                             <p class="mg-b-10">Storey Range</p>
-                            <select class="form-control select2-no-search full-width">
+                            <select id="storey_range" class="form-control select2-no-search full-width" required>
                                 <option label="Range depends on individual flats"></option>
                                 <option value="1">Low</option>
                                 <option value="2">Medium</option>
@@ -69,25 +69,25 @@
                             </select>
                         </div>
 
-                        <div class="mg-b-20">
-                            <p class="mg-b-10">Floor Area (sqm)</p>
-                            <input id="floor-area" class="form-control" placeholder="Numbers Only" type="text">
-                        </div>
-
-                        <div class="mg-b-20">
-                            <p class="mg-b-10">Lease Commence Year</p>
-                            <select id="year" class="form-control select2-no-search full-width">
-                                <!-- Options will be populated by JavaScript -->
-                            </select>
-                        </div>
-
-                        <div class="mg-b-20">
-                            <p class="mg-b-10">Max Floor Level</p>
-                            <select id="floor-select" class="form-control select2 full-width">
-                                <option label="1 - 50 Max"></option>
-                                <!-- Options will be populated by JavaScript -->
-                            </select>
-                        </div>
+                        {#                        <div class="mg-b-20">#}
+                        {#                            <p class="mg-b-10">Floor Area (sqm)</p>#}
+                        {#                            <input id="floor-area" class="form-control" placeholder="Numbers Only" type="text" required>#}
+                        {#                        </div>#}
+                        {##}
+                        {#                        <div class="mg-b-20">#}
+                        {#                            <p class="mg-b-10">Lease Commence Year</p>#}
+                        {#                            <select id="year" class="form-control select2-no-search full-width" required>#}
+                        {#                                <!-- Options will be populated by JavaScript -->#}
+                        {#                            </select>#}
+                        {#                        </div>#}
+                        {##}
+                        {#                        <div class="mg-b-20">#}
+                        {#                            <p class="mg-b-10">Max Floor Level</p>#}
+                        {#                            <select id="floor-select" class="form-control select2 full-width" required>#}
+                        {#                                <option label="1 - 50 Max"></option>#}
+                        {#                                <!-- Options will be populated by JavaScript -->#}
+                        {#                            </select>#}
+                        {#                        </div>#}
 
                         <!-- Submit button (full width) -->
                         <button type="button" id="predictButton" class="btn btn-primary submit-btn full-width">Predict
@@ -99,6 +99,7 @@
                         <!-- Empty initially; will be updated dynamically -->
                         <div id="price-prediction" class="price-prediction">
                             <!-- Placeholder for the price prediction -->
+
                         </div>
                     </div>
                 </div>
@@ -177,6 +178,55 @@
                     })
                     .catch(error => console.error('Error fetching flat types:', error));
             });
+
+            // On clicking the predict button
+            $('#predictButton').on('click', function () {
+                // Collect data from form
+                const data = {
+                    month_year: $('#datetimepicker').val(),
+                    town: $('#town-select').val(),
+                    block: $('#block-select').val(),
+                    street: $('#street-select').val(),
+                    flat_type: $('#flat-select').val(),
+                    storey_range: $('#storey_range').val(),
+                };
+
+                // Check if any field is empty and show an alert
+                if (!data.month_year) {
+                    alert('Please fill in Targeted Month - Year field.');
+                    return; // Prevent the form from being submitted
+                } else if (!data.town) {
+                    alert('Please fill in Town field.');
+                    return;
+                } else if (!data.block) {
+                    alert('Please fill in Block field.');
+                    return;
+                } else if (!data.street) {
+                    alert('Please fill in Street Name field.');
+                    return;
+                } else if (!data.flat_type) {
+                    alert('Please fill in Flat Type field.');
+                    return;
+                } else if (!data.storey_range) {
+                    alert('Please fill in Storey Range field.');
+                    return;
+                }
+
+                // Send data to Flask using AJAX
+                $.ajax({
+                    url: '/prediction',  // URL for the prediction route
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),  // Send the collected data as JSON
+                    success: function (response) {
+                        // If successful, display the predicted price in the output section
+                        $('#price-prediction').html(`<h3>Predicted Price: $${response.predicted_price}</h3>`);
+                    },
+                    error: function (error) {
+                        console.error('Error predicting price:', error);
+                    }
+                });
+            });
         });
     </script>
     <script>
@@ -229,9 +279,18 @@
                 autoclose: true,
                 minDate: 0,
                 onClose: function (dateText, inst) {
+                    // Get selected month and year
                     const month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
                     const year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-                    $(this).datepicker('setDate', new Date(year, month, 1)); // Set the chosen date
+
+                    // Add leading zero to month if needed
+                    const formattedMonth = (parseInt(month) + 1).toString().padStart(2, '0');
+
+                    // Create the desired format 'YYYY-MM'
+                    const formattedDate = `${year}-${formattedMonth}`;
+
+                    // Set the formatted date in the input field
+                    $(this).val(formattedDate);
                 },
                 beforeShow: function (input, inst) {
                     $(inst.dpDiv).addClass('month-year-picker'); // Add custom class
@@ -241,30 +300,7 @@
             // Set the initial date
             $('#datetimepicker').datepicker('setDate', myDate);
 
-            // Populate the Lease Commence Year dropdown
-            var currentYear = new Date().getFullYear() - 4; // Set the year, excluding the most recent 4 years
-            var minYear = currentYear - 1960; // Adjust to determine the oldest year allowed
 
-            // Loop through years up to the year before the current year
-            for (var year = currentYear - minYear; year < currentYear; year++) {
-                var option = document.createElement("option");
-                option.text = year;
-                option.value = year;
-                document.getElementById("year").appendChild(option);
-            }
-
-            // Optionally, set the default value to the most recent year available
-            document.getElementById("year").value = currentYear - 1;
-
-            // Populate the Max Floor Level dropdown with options from 1 to 50
-            for (var i = 1; i <= 50; i++) {
-                $('#floor-select').append(new Option(i, i));
-            }
-
-            document.getElementById('floor-area').addEventListener('input', function (e) {
-                // Remove any non-digit characters from the input
-                this.value = this.value.replace(/\D/g, '');
-            });
         });
     </script>
 

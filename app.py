@@ -12,7 +12,8 @@ from datetime import datetime
 import threading
 locale.setlocale(locale.LC_ALL, '')
 import time
-
+import joblib
+from tensorflow.keras.models import load_model
 
 app = Flask(__name__)
 
@@ -269,6 +270,100 @@ def prediction():
     tn_list = df['town'].unique().tolist()  # List of unique towns
     return render_template('prediction.html', user=current_user, tn_list=tn_list, date=date)
 
+# Route to handle prediction
+@app.route('/prediction', methods=['POST'])
+def predict():
+    data = request.json  # Get the data from the AJAX request
+    print("Received data:", data)
+
+    # Extract values
+    month_year = data.get("month_year")
+    town = data.get("town")
+    block = data.get("block")
+    street_name = data.get("street")
+    flat_type = data.get("flat_type")
+    storey_range = int(data.get("storey_range"))
+
+    # Filter the DataFrame to find the matching row(s)
+    filtered_df = df[
+        (df['town'] == town) &
+        (df['block'] == block) &
+        (df['street_name'] == street_name) &
+        (df['flat_type'] == flat_type)
+        ]
+
+    predicted_price = 0
+    # Check if we found a matching row
+    if not filtered_df.empty:
+        # Extract the first matching row (you can handle multiple matches if necessary)
+        result = filtered_df.iloc[0]
+
+        # Prepare the data to return to the front-end
+        output = {
+            'town': town,
+            'flat_type': result['flat_type'],
+            'block': block,
+            'street_name': street_name,
+            'storey_range': storey_range,
+            'floor_area_sqm': result['floor_area_sqm'],
+            'lease_commence_date': result['lease_commence_date'],
+            'remaining_lease': result['remaining_lease'],
+            'max_floor_lvl': result['max_floor_lvl'],
+            'year_completed': result['year_completed'],
+            'nearest_mrt': result['nearest_mrt'],
+            'nearest_distance_to_mrt': result['nearest_distance_to_mrt'],
+            'month_numeric': convert_to_months_since_base(month_year),
+        }
+
+        print("Output", output)
+        predicted_price = predicting(output)
+        print("Predicted: ", predicted_price)
+    else:
+        print('No matching data found')
+
+    # Return the predicted price as JSON
+    return jsonify({"predicted_price": predicted_price})
+
+# Define your function to convert 'year-month' to months since the base year
+def convert_to_months_since_base(year_month, base_year=1960):
+    year, month = map(int, year_month.split('-'))
+    months_since_base = (year - base_year) * 12 + month
+    print(months_since_base)
+    return months_since_base
+
+def predicting(input_dict):
+    # Load the models and scalers
+    model = load_model(path + '/static/prediction/resale_model_updated.h5')
+    label_encoders = joblib.load(path + '/static/prediction/label_encoders.pkl')  # Load label encoders
+    scaler_X = joblib.load(path + '/static/prediction/scaler_X.pkl')  # Load feature scaler
+    scaler_y = joblib.load(path + '/static/prediction/scaler_y.pkl')  # Load target scaler
+
+    print(input_dict)
+    # Create a DataFrame from the input
+    input_df = pd.DataFrame([input_dict])
+
+    # Map categorical columns using the loaded encoders
+    for col in label_encoders.keys():
+        if col in input_df.columns:
+            le = label_encoders[col]  # Get the correct mapping for the column
+            print(len(le.keys()))
+            # Check if the input value is valid for the LabelEncoder
+            if input_dict[col] not in le.keys():
+                print(f"Warning: '{input_dict[col]}' is not a recognized value for '{col}'.")
+
+            # Transform the input using the dictionary mapping
+            input_df[col] = le[input_dict[col]]
+
+    # Scale the input
+    input_scaled = scaler_X.transform(input_df)
+
+    # Make the prediction
+    prediction_result = model.predict(input_scaled)
+
+    predicted_value = scaler_y.inverse_transform(prediction_result.reshape(-1, 1))
+
+    return predicted_value.tolist()
+
 @app.route('/get_blocks/<town>', methods=['GET'])
 def get_blocks(town):
     blocks = df[df['town'] == town]['block'].unique().tolist()  # Get unique blocks for the selected town
@@ -283,6 +378,7 @@ def get_streets(town, block):
 def get_flats(block, street):
     flat_types = df[(df['block'] == block) & (df['street_name'] == street)]['flat_type'].unique().tolist()
     return jsonify({'flat_types': flat_types})
+
 
 
 if __name__ == '__main__':
