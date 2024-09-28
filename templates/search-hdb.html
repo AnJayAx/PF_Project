@@ -1,135 +1,327 @@
-
 {% extends "base.html" %}
 
 {% block title %}HDB Haven - Search{% endblock %}
 
 {% block content %}
-    <div class="az-content pd-y-20 pd-lg-y-30 pd-xl-y-40">
-      <div class="container">
-        <div class="az-content-body pd-lg-l-40 d-flex flex-column">
-          <h2 class="az-content-title">Comprehensive HDB Data</h2>
-          <div class="az-content-label mg-b-5">Select your filters.</div>
-          <p class="mg-b-20">Search for data on the exact HDB you what you want.</p>
+<div class="az-content">
+  <div class="container">
+    <div class="az-content-body">
+      <h2 class="az-content-title">Comprehensive HDB Data</h2>
+      <div class="az-content-label mg-b-5">Select your filters.</div>
+      <p class="mg-b-20">Search for data on the type of flat you wish to purchase.</p>
 
-          <div class="wd-200 mg-b-20">
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <div class="input-group-text">
-                  From
+      <div class="row row-sm">
+        <div class="col-lg-6">
+          <p class="mg-b-10">Date Range</p>
+          <div class="row row-sm">
+            <!-- From Date -->
+            <div class="wd-200 mg-b-20">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    From
+                  </div>
                 </div>
+                <input id="from-date-input" type="text" class="form-control fc-datepicker" placeholder="MM/DD/YYYY">
               </div>
-              <input type="text" class="form-control fc-datepicker" placeholder="MM/DD/YYYY">
             </div>
-          </div>
-          <div class="wd-200 mg-b-20">
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <div class="input-group-text">
-                  To
+            <!-- To Date -->
+            <div class="wd-200 mg-b-20">
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <div class="input-group-text">
+                    To
+                  </div>
                 </div>
+                <input id="to-date-input" type="text" class="form-control fc-datepicker" placeholder="MM/DD/YYYY">
               </div>
-              <input type="text" class="form-control fc-datepicker" placeholder="MM/DD/YYYY">
             </div>
-          </div>
-          <!-- <div class="wd-200 mg-b-20">
-            <label for="startDate">Date :</label>
-            <input name="startDate" id="startDate" class="date-picker" />
-          </div> -->
-          <div class="table-responsive">
-            <table id="main-table" class="" style="display: inline-block; overflow: auto;">
-              <thead>
-                <tr>
-                  <th style="position: sticky; top: 0; background-color: white;">Month</th>
-                  <th data-dt-order="disable" style="position: sticky; top: 0; background-color: white;">Town</th>
-                  <th style="position: sticky; top: 0; background-color: white;">Flat Type</th>
-                  <th style="position: sticky; top: 0; background-color: white;">Floor Area (m<sup>2</sup>)</th>
-                  <th style="position: sticky; top: 0; background-color: white;">Resale Price</th>
-                  <th style="position: sticky; top: 0; background-color: white;">$ / m<sup>2</sup></th>
-                  <th data-dt-order="disable" style="position: sticky; top: 0; background-color: white;">Street Name</th>
-                  <th data-dt-order="disable" style="position: sticky; top: 0; background-color: white;">Block</th>
-                  <th style="position: sticky; top: 0; background-color: white;">Storey Range</th>
-                  <!-- <th style="position: sticky; top: 0; background-color: white;">Flat Model</th> -->
-                  <th style="position: sticky; top: 0; background-color: white;">Lease Commence Date</th>
-                  </tr>
-              </thead>
-              <tbody>
-                {% for i in rows %}
-                <tr>
-                    <td>{{ records[i]["month"] }}</td>
-                    <td>{{ records[i]["town"] }}</td>
-                    <td>{{ records[i]["flat_type"] }}</td>
-                    <td value={{ records[i]["floor_area_sqm"] }}>{{ records[i]["floor_area_sqm"] }}</td>
-                    <!-- <td hidden>{{ records[i]["resale_price"] }}</td> -->
-                    <td class="currency" value={{ records[i]["resale_price"] }}>{{ records[i]["f_resale_price"] }}</td>
-                    <!-- <td hidden>{{ records[i]["price_per_sq_metre"] }}</td> -->
-                    <td class="currency" value={{ records[i]["price_per_sq_metre"] }}>{{ records[i]["f_price_per_sq_metre"] }}</td>
-                    <td>{{ records[i]["street_name"] }}</td>
-                    <td>{{ records[i]["block"] }}</td>
-                    <td>{{ records[i]["storey_range"] }}</td>
-                    <!-- <td>{{ records[i]["flat_model"] }}</td> -->
-                    <td>{{ records[i]["lease_commence_date"] }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div><!-- table-responsive -->
+          </div> <!-- Row -->
+        </div> <!-- Col -->
+        <div class="col-lg-2">
+          <p class="mg-b-10">Town</p>
+          <select id="town-input" class="form-control select2">
+            <option label="Choose one"></option>
+            <option value="Firefox">Firefox</option>
+            <option value="Chrome">Chrome</option>
+            <option value="Safari">Safari</option>
+            <option value="Opera">Opera</option>
+            <option value="Internet Explorer">Internet Explorer</option>
+          </select>
+        </div> <!-- Col -->
+        <div class="col-lg-2">
+          <p class="mg-b-10">Flat Type</p>
+          <select id="flat-type-input" class="form-control select2">
+            <option label="Choose one"></option>
+            <option value="Executive">Executive</option>
+            <option value="5 Room">5 Room</option>
+            <option value="4 Room">4 Room</option>
+            <option value="3 Room">3 Room</option>
+            <option value="2 Room">2 Room</option>
+          </select>
+        </div> <!-- Col -->
+      </div> <!-- Row -->
 
-          <div class="ht-40"></div>
 
-        </div><!-- az-content-body -->
-      </div><!-- container -->
-    </div><!-- az-content -->
 
-    <script>
-        let table = new DataTable('#main-table', {
-          ordering: false,
-          "processing": true,
-          "serverSide": true,
-          "ajax": "/get_data",
-          "columns": [
-            // { "data": "_id" },
-            { "data": "month" }, 
-            { "data": "town" },
-            { "data": "flat_type" },
-            { "data": "floor_area_sqm" },
-            { "data": "f_resale_price" },
-            { "data": "f_price_per_sq_metre" },
-            { "data": "street_name" },
-            { "data": "block" },
-            { "data": "storey_range" },
-            { "data": "lease_commence_date" },
-            // { "data": "flat_model" },
-            // { "data": "remaining_lease" },
-          ],
-          columnDefs: [
-            { width: '15%', targets: 1},
-            { width: '10%', targets: 3},
-            { width: '20%', targets: 6},
-            { width: '2%', targets: -1},
-          ],
-          layout: {
-            topStart: null,
-            topEnd: null,
-          },
-    
+      <!-- Price Range Pickers -->
+      <div class="row row-sm">
+
+        <div class="col-lg-6">
+          <p class="mg-b-10">Resale Price Range</p>
+          <input type="text" id="price-range-input" class="rangeslider1" data-extra-classes="irs-modern">
+        </div> <!-- Col-->
+
+        <div class="col-lg-6">
+          <p class="mg-b-10">$ / m<sup>2</sup> Range</p>
+          <input type="text" id="price-range-input" class="rangeslider2" data-extra-classes="irs-modern">
+        </div>
+
+      </div> <!-- Row -->
+
+
+
+
+  <hr class="mg-y-20">
+
+  <!-- <div id="loading">Loading data, please wait...</div> -->
+  <div class="table-responsive">
+    <table id="main-table" class="" style="display: inline-block; overflow: auto;">
+      <thead>
+        <tr>
+          <th style="position: sticky; top: 0; background-color: white;">Month</th>
+          <th data-dt-order="disable" style="position: sticky; top: 0; background-color: white;">Town</th>
+          <th style="position: sticky; top: 0; background-color: white;">Flat Type</th>
+          <th style="position: sticky; top: 0; background-color: white;">Floor Area (m<sup>2</sup>)</th>
+          <th style="position: sticky; top: 0; background-color: white;">Resale Price</th>
+          <th style="position: sticky; top: 0; background-color: white;">$ / m<sup>2</sup></th>
+          <th data-dt-order="disable" style="position: sticky; top: 0; background-color: white;">Street Name</th>
+          <th data-dt-order="disable" style="position: sticky; top: 0; background-color: white;">Block</th>
+          <th style="position: sticky; top: 0; background-color: white;">Storey Range</th>
+          <!-- <th style="position: sticky; top: 0; background-color: white;">Flat Model</th> -->
+          <th style="position: sticky; top: 0; background-color: white;">Lease Commence Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in data %}
+        <tr>
+          <td>{{ row["month"] }}</td>
+          <td>{{ row["town"] }}</td>
+          <td>{{ row["flat_type"] }}</td>
+          <td value={{ row["floor_area_sqm"] }}>{{ row["floor_area_sqm"] }}</td>
+          <!-- <td hidden>{{ row["resale_price"] }}</td> -->
+          <td class="currency" value={{ row["resale_price"] }}>{{ row["f_resale_price"] }}</td>
+          <!-- <td hidden>{{ row["price_per_sq_metre"] }}</td> -->
+          <td class="currency" value={{ row["price_per_sq_metre"] }}>{{ row["f_price_per_sq_metre"] }}
+          </td>
+          <td>{{ row["street_name"] }}</td>
+          <td>{{ row["block"] }}</td>
+          <td>{{ row["storey_range"] }}</td>
+          <!-- <td>{{ row["flat_model"] }}</td> -->
+          <td>{{ row["lease_commence_date"] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div><!-- table-responsive -->
+
+  <div class="ht-40"></div>
+
+</div><!-- az-content-body -->
+</div><!-- container -->
+</div><!-- az-content -->
+
+<script>
+  let table = new DataTable('#main-table', {
+    ordering: false,
+    "processing": true,
+    "serverSide": true,
+    "ajax": "/get_data",
+    "columns": [
+      // { "data": "_id" },
+      { "data": "month" },
+      { "data": "town" },
+      { "data": "flat_type" },
+      { "data": "floor_area_sqm" },
+      { "data": "f_resale_price" },
+      { "data": "f_price_per_sq_metre" },
+      { "data": "street_name" },
+      { "data": "block" },
+      { "data": "storey_range" },
+      { "data": "lease_commence_date" },
+      // { "data": "flat_model" },
+      // { "data": "remaining_lease" },
+    ],
+    columnDefs: [
+      { width: '15%', targets: 1 },
+      { width: '10%', targets: 3 },
+      { width: '20%', targets: 6 },
+      { width: '2%', targets: -1 },
+    ],
+    layout: {
+      topStart: null,
+      topEnd: null,
+    },
+    language: {
+        emptyTable: 'Loading data...'
+    }
+  });
+
+  // Datepicker
+  $('.fc-datepicker').datepicker({
+    showOtherMonths: true,
+    selectOtherMonths: true,
+    changeMonth: true,
+    changeYear: true,
+    showButtonPanel: true,
+    dateFormat: 'MM yy',
+    onClose: function (dateText, inst) {
+      $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
+    }
+  });
+
+  $('.rangeslider1').ionRangeSlider({
+    type: 'double',
+    grid: true,
+    min: 0,
+    max: 1300000,
+    from: 300000,
+    to: 700000,
+    prefix: '$'
+  });
+
+  $('.rangeslider2').ionRangeSlider({
+    type: 'double',
+    grid: true,
+    min: 2000,
+    max: 12000,
+    from: 4000,
+    to: 7000,
+    prefix: '$'
+  });
+
+  $(document).ready(function () {
+    $('.select2').select2({
+      placeholder: 'Choose one',
+      searchInputPlaceholder: 'Search'
+    });
+
+    $('.select2-no-search').select2({
+      minimumResultsForSearch: Infinity,
+      placeholder: 'Choose one'
+    });
+
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+    socket.on('data_ready', function(msg) {
+        console.log(msg.message);  // Log the message from the server
+        table.destroy();
+
+        // Initialize DataTables after receiving the signal
+        $('#main-table').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": "/get_data",
+                "type": "GET"
+            },
+            "columns": [
+                // { "data": "_id" },
+                { "data": "month" },
+                { "data": "town" },
+                { "data": "flat_type" },
+                { "data": "floor_area_sqm" },
+                { "data": "f_resale_price" },
+                { "data": "f_price_per_sq_metre" },
+                { "data": "street_name" },
+                { "data": "block" },
+                { "data": "storey_range" },
+                { "data": "lease_commence_date" },
+                // { "data": "flat_model" },
+                // { "data": "remaining_lease" },
+              ],
+              columnDefs: [
+                { width: '15%', targets: 1 },
+                { width: '10%', targets: 3 },
+                { width: '20%', targets: 6 },
+                { width: '2%', targets: -1 },
+              ],
+              layout: {
+                topStart: null,
+                topEnd: null,
+              },
+              language: {
+                emptyTable: 'Loading data...' // Change for when no records while searching
+              }
         });
 
-        // Datepicker
-        $('.fc-datepicker').datepicker({
-          showOtherMonths: true,
-          selectOtherMonths: true,
-          changeMonth: true, 
-          changeYear: true,
-          showButtonPanel: true,
-          dateFormat: 'MM yy',
-          onClose: function(dateText, inst) { 
-            $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
-        }
-        });
-    </script>
-    <style>
-      .ui-datepicker-calendar {
-        display: none;
-      }
-    </style>
+        // Hide loading message and show table
+        $('#loading').hide();
+        $('#main-table').show();
+    });
+
+  });
+</script>
+<style>
+  .ui-datepicker-calendar {
+    display: none;
+  }
+
+  /* Styling for the dropdowns */
+  .ui-datepicker .ui-datepicker-title {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    /* Space between dropdowns */
+  }
+
+  /* Styling for the previous and next arrows */
+  .ui-datepicker .ui-datepicker-prev,
+  .ui-datepicker .ui-datepicker-next {
+    top: 0;
+    /* Align arrows vertically with the dropdowns */
+    width: 20px;
+    height: 20px;
+    margin: 0 10px;
+    /* Space between the arrows and dropdowns */
+  }
+
+  .ui-datepicker-prev {
+    left: 10px;
+  }
+
+  .ui-datepicker-next {
+    right: 10px;
+  }
+
+  /* Dropdowns padding */
+  .ui-datepicker .ui-datepicker-title select {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+  }
+
+  /* Adjust Done and Today button layout */
+  .ui-datepicker-buttonpane {
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  .ui-datepicker-buttonpane button {
+    background-color: #007bff;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    border: none;
+    font-size: 14px;
+    margin: 0 5px;
+    cursor: pointer;
+  }
+
+  .ui-datepicker-buttonpane button:hover {
+    background-color: #0056b3;
+  }
+</style>
 {% endblock %}

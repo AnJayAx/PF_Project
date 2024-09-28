@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, login_required, logout_user, current_user, LoginManager
+from flask_socketio import SocketIO, emit
 import requests
 import locale
 import re
@@ -16,6 +17,7 @@ import joblib
 from tensorflow.keras.models import load_model
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
 # Google Cloud SQL
 PASSWORD = "123"
@@ -43,16 +45,17 @@ login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
 
-# Table data in memory
-table_data_chunks = []
+# Table DataFrame
+df_api_data = pd.DataFrame()
 
 def fetch_data_from_api():
     completeAPICall = False
-    global table_data_chunks
-    local_data_chunks = []
+    global df_api_data
+    table_data_chunks = []
     base_url = "https://data.gov.sg"
     first_api_res = "/api/action/datastore_search?resource_id=d_8b84c4ee58e3cfc0ece0d773c8ca6abc"
-    hdb_api = base_url + first_api_res
+    limit = "&limit=9999"
+    hdb_api = base_url + first_api_res + limit
 
     start = time.time()
     while not completeAPICall:
@@ -66,18 +69,18 @@ def fetch_data_from_api():
                 j["f_resale_price"] = locale.currency(float(j["resale_price"]), grouping=True)
                 j["f_price_per_sq_metre"] = locale.currency(float(j["price_per_sq_metre"]), grouping=True)
 
-            # Chunk data into groups of 10
-            chunk_size = 10
-            for i in range(0, len(records), chunk_size):
-                local_data_chunks = [records[i:i + chunk_size]]
-                local_data_chunks.reverse()
-
+            table_data_chunks.extend(records)
+            
             try:
-                if (data["result"]["total"] - data["result"]["offset"]) <= 100:
+                print(data["result"]["offset"] > data["result"]["total"])
+                if data["result"]["offset"] > data["result"]["total"]:
                     completeAPICall = True
                     end = time.time()
                     time_taken = (end - start) / 60
-
+                    
+                    df_api_data = pd.DataFrame(table_data_chunks)
+                    socketio.emit('data_ready', {'message': 'Data is ready!'})
+                   
                     print("Loop End ++++++")
                     print("Time Taken for full API call: " + str(time_taken))
             except:
@@ -85,8 +88,6 @@ def fetch_data_from_api():
                 pass
 
             hdb_api = base_url + data["result"]["_links"]["next"]
-            table_data_chunks.insert(0, local_data_chunks)
-
         else:
             print('Failed to fetch data from API')
             break
@@ -216,40 +217,28 @@ def get_data():
     start = int(request.args.get('start', 0))  # Starting index
     length = int(request.args.get('length', 10))  # Number of rows per page
 
-    # [ [{1},{2},{3},{4},{5}] , [{1},{2},{3},{4},{5}] ]
+    # Total number of records in the DataFrame
+    total_records = len(df_api_data)
 
-    # Data chunking
-    filtered_data = sum(table_data_chunks, [])
-    total_records = len(filtered_data)
-    data_to_send = filtered_data[start:start + length]
-    #print(data_to_send[0])
+    # Slice the DataFrame based on pagination parameters
+    paginated_data = df_api_data.iloc[start:start + length]
+
+    # Convert the sliced data to a list of dictionaries (records)
+    data_to_send = paginated_data.to_dict(orient='records')
+
     response = {
         'draw': draw,
         'recordsTotal': total_records,  # Total number of records
         'recordsFiltered': total_records,  # Number of records after filtering
-        'data': data_to_send[0]  # Send only the current page's data
+        'data': data_to_send  # Send only the current page's data
     }
 
     return jsonify(response)
 
 @app.route('/search-hdb', methods=['GET', 'POST'])
 def search_hdb():
-    offsetTesting = "&offset=189600"
-    datasetId = "d_8b84c4ee58e3cfc0ece0d773c8ca6abc" + offsetTesting
-    url = "https://data.gov.sg/api/action/datastore_search?resource_id=" + datasetId + offsetTesting
-
-    responseJSON = requests.get(url).json()
-
-    print("-------------------------------")
-    records = responseJSON["result"]["records"]
-    # Self-calculate Price per Sq Metre and insert into the records.
-    for i in records:
-        i["price_per_sq_metre"] = str(round(float(i["resale_price"]) / float(i["floor_area_sqm"]), 2))
-        i["f_resale_price"] = locale.currency(float(i["resale_price"]), grouping=True)
-        i["f_price_per_sq_metre"] = locale.currency(float(i["price_per_sq_metre"]), grouping=True)
-    # print(records)
-    print("-------------------------------")
-    rows = range(len(records))
+    #print(df_api_data.columns)
+    #data = df_api_data[['month', 'town', 'flat_type', 'block', 'street_name', 'storey_range', 'floor_area_sqm', 'lease_commence_date', 'resale_price', 'f_resale_price', 'f_price_per_sq_metre']].to_dict(orient='records')
     # Filters required:
     # (DateTimePicker) - Date Range from Start to End, 
     # (Range Slider) - Price Range, 
@@ -382,4 +371,5 @@ def get_flats(block, street):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, use_reloader=True)
+    #app.run(debug=True, use_reloader=True)
+    socketio.run(app, debug=True, use_reloader=True)
