@@ -213,7 +213,9 @@
       { width: '2%', targets: -2 },
     ],
     layout: {
-      topStart: null,
+      topStart: {
+          buttons: [{extend: 'colvis', text: 'Show/Hide Columns'}]
+        },
       topEnd: null,
     },
     language: {
@@ -269,7 +271,9 @@
                 { width: '2%', targets: -2 },
               ],
               layout: {
-                topStart: null,
+                topStart: {
+                  buttons: [{extend: 'colvis', text: 'Show/Hide Columns'}]
+                },
                 topEnd: null,
               },
               language: {
