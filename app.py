@@ -38,6 +38,7 @@ class Users(db.Model, UserMixin):
     email = db.Column(db.String(70), nullable=False, unique=True)
     password = db.Column(db.String(45), nullable=False)
 
+path = os.getcwd()
 
 # Session management
 app.secret_key = '5791628bb0b13ce0c676dfde280ba245'
@@ -45,8 +46,9 @@ login_manager = LoginManager()
 login_manager.login_view = 'login'
 login_manager.init_app(app)
 
-# Table DataFrame
+# Table DataFrames
 df_api_data = pd.DataFrame()
+df_older_data = pd.read_csv(path + '/static/csv/ResaleFlatPrices1990-2016.csv')
 
 def fetch_data_from_api():
     completeAPICall = False
@@ -77,10 +79,23 @@ def fetch_data_from_api():
                     completeAPICall = True
                     end = time.time()
                     time_taken = (end - start) / 60
-                    
+
                     df_api_data = pd.DataFrame(table_data_chunks)
+
+                    if '_id' in df_api_data.columns:
+                        start_id = df_api_data['_id'].max() + 1
+                    else:
+                        start_id = 1  # If JSON has no IDs, start from 1
+                    df_older_data['_id'] = range(start_id, start_id + len(df_older_data))                    
+                    df_api_data = pd.concat([df_api_data, df_older_data], ignore_index=True, sort=False)
+
+                    # Sort by date
+                    df_api_data['month'] = pd.to_datetime(df_api_data['month'], format='%Y-%m', errors='coerce')
+                    df_api_data = df_api_data.sort_values(by='month', ascending=False)
+                    df_api_data['month'] = df_api_data['month'].dt.strftime('%Y-%m')
+
                     socketio.emit('data_ready', {'message': 'Data is ready!'})
-                   
+
                     print("Loop End ++++++")
                     print("Time Taken for full API call: " + str(time_taken))
             except:
@@ -215,13 +230,19 @@ def get_data():
     # Get request parameters from Datatables
     draw = request.args.get('draw')  # For keeping track of requests
     start = int(request.args.get('start', 0))  # Starting index
-    length = int(request.args.get('length', 10))  # Number of rows per page
+    length = int(request.args.get('length', 20))  # Number of rows per page
+    df_to_use = df_older_data
+    #print(df_to_use)
+
+    # Uses older data into the table until api data is fully retrieved. Then use that.
+    if not df_api_data.empty:
+        df_to_use = df_api_data
 
     # Total number of records in the DataFrame
-    total_records = len(df_api_data)
+    total_records = len(df_to_use)
 
     # Slice the DataFrame based on pagination parameters
-    paginated_data = df_api_data.iloc[start:start + length]
+    paginated_data = df_to_use.iloc[start:start + length]
 
     # Convert the sliced data to a list of dictionaries (records)
     data_to_send = paginated_data.to_dict(orient='records')
@@ -250,7 +271,6 @@ def search_hdb():
     return render_template('search-hdb.html', title='index', user=current_user)
 
 # Load the CSV data into a global variable to avoid reloading
-path = os.getcwd()
 df = pd.read_csv(path + '/static/csv/ResaleFlatPrices.csv')
 
 @app.route('/predict', methods=['GET'])

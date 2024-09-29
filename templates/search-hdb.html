@@ -9,7 +9,9 @@
       <h2 class="az-content-title">Comprehensive HDB Data</h2>
       <div class="az-content-label mg-b-5">Select your filters.</div>
       <p class="mg-b-20">Search for data on the type of flat you wish to purchase.</p>
-
+      
+      <hr class="mg-y-20">
+      
       <div class="row row-sm">
         <div class="col-lg-6">
           <p class="mg-b-10">Date Range</p>
@@ -22,7 +24,7 @@
                     From
                   </div>
                 </div>
-                <input id="from-date-input" type="text" class="form-control fc-datepicker" placeholder="MM/DD/YYYY">
+                <input id="from-date-input" type="text" class="form-control fc-datepicker" placeholder="MM/YYYY">
               </div>
             </div>
             <!-- To Date -->
@@ -33,12 +35,12 @@
                     To
                   </div>
                 </div>
-                <input id="to-date-input" type="text" class="form-control fc-datepicker" placeholder="MM/DD/YYYY">
+                <input id="to-date-input" type="text" class="form-control fc-datepicker" placeholder="MM/YYYY">
               </div>
             </div>
           </div> <!-- Row -->
         </div> <!-- Col -->
-        <div class="col-lg-2">
+        <div class="col-lg-3">
           <p class="mg-b-10">Town</p>
           <select id="town-input" class="form-control select2">
             <option label="Choose one"></option>
@@ -49,7 +51,7 @@
             <option value="Internet Explorer">Internet Explorer</option>
           </select>
         </div> <!-- Col -->
-        <div class="col-lg-2">
+        <div class="col-lg-3">
           <p class="mg-b-10">Flat Type</p>
           <select id="flat-type-input" class="form-control select2">
             <option label="Choose one"></option>
@@ -68,15 +70,22 @@
       <div class="row row-sm">
 
         <div class="col-lg-6">
-          <p class="mg-b-10">Resale Price Range</p>
-          <input type="text" id="price-range-input" class="rangeslider1" data-extra-classes="irs-modern">
+          <p class="mg-b-10">Floor Area Range</p>
+          <input type="text" id="area-range-input" class="rangeslider1" data-extra-classes="irs-modern">
         </div> <!-- Col-->
 
         <div class="col-lg-6">
           <p class="mg-b-10">$ / m<sup>2</sup> Range</p>
-          <input type="text" id="price-range-input" class="rangeslider2" data-extra-classes="irs-modern">
+          <input type="text" id="price-per-metre-range-input" class="rangeslider2" data-extra-classes="irs-modern">
         </div>
 
+      </div> <!-- Row -->
+
+      <div class="row row-sm">
+        <div class="col-lg-12">
+          <p class="mg-b-10">Resale Price Range</p>
+          <input type="text" id="price-range-input" class="rangeslider1" data-extra-classes="irs-modern">
+        </div> <!-- Col-->
       </div> <!-- Row -->
 
 
@@ -86,7 +95,7 @@
 
   <!-- <div id="loading">Loading data, please wait...</div> -->
   <div class="table-responsive">
-    <table id="main-table" class="" style="display: inline-block; overflow: auto;">
+    <table id="main-table" class="hover stripe row-border dataTable" style="display: inline-block; overflow: auto;">
       <thead>
         <tr>
           <th style="position: sticky; top: 0; background-color: white;">Month</th>
@@ -100,6 +109,7 @@
           <th style="position: sticky; top: 0; background-color: white;">Storey Range</th>
           <!-- <th style="position: sticky; top: 0; background-color: white;">Flat Model</th> -->
           <th style="position: sticky; top: 0; background-color: white;">Lease Commence Date</th>
+          <th style="position: sticky; top: 0; background-color: white;">Remaining Lease</th>
         </tr>
       </thead>
       <tbody>
@@ -132,6 +142,50 @@
 </div><!-- az-content -->
 
 <script>
+  // Datepicker
+  $('.fc-datepicker').datepicker({
+    showOtherMonths: true,
+    selectOtherMonths: true,
+    changeMonth: true,
+    changeYear: true,
+    showButtonPanel: true,
+    dateFormat: 'MM yy',
+    onClose: function (dateText, inst) {
+      $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
+    }
+  });
+
+  $('#price-range-input').ionRangeSlider({
+    type: 'double',
+    grid: true,
+    min: 0,
+    max: 1300000,
+    from: 300000,
+    to: 700000,
+    prefix: '$'
+  });
+
+  $('#price-per-metre-range-input').ionRangeSlider({
+    type: 'double',
+    grid: true,
+    min: 2000,
+    max: 12000,
+    from: 4000,
+    to: 7000,
+    prefix: '$'
+  });
+
+  $('#area-range-input').ionRangeSlider({
+    type: 'double',
+    grid: true,
+    min: 0,
+    max: 160,
+    from: 30,
+    to: 50,
+    prefix: ''
+  });
+
+
   let table = new DataTable('#main-table', {
     ordering: false,
     "processing": true,
@@ -149,14 +203,14 @@
       { "data": "block" },
       { "data": "storey_range" },
       { "data": "lease_commence_date" },
+      { "data": "remaining_lease" },
       // { "data": "flat_model" },
-      // { "data": "remaining_lease" },
     ],
     columnDefs: [
       { width: '15%', targets: 1 },
       { width: '10%', targets: 3 },
       { width: '20%', targets: 6 },
-      { width: '2%', targets: -1 },
+      { width: '2%', targets: -2 },
     ],
     layout: {
       topStart: null,
@@ -164,42 +218,10 @@
     },
     language: {
         emptyTable: 'Loading data...'
-    }
+    },
+    "pageLength": 15,
   });
-
-  // Datepicker
-  $('.fc-datepicker').datepicker({
-    showOtherMonths: true,
-    selectOtherMonths: true,
-    changeMonth: true,
-    changeYear: true,
-    showButtonPanel: true,
-    dateFormat: 'MM yy',
-    onClose: function (dateText, inst) {
-      $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
-    }
-  });
-
-  $('.rangeslider1').ionRangeSlider({
-    type: 'double',
-    grid: true,
-    min: 0,
-    max: 1300000,
-    from: 300000,
-    to: 700000,
-    prefix: '$'
-  });
-
-  $('.rangeslider2').ionRangeSlider({
-    type: 'double',
-    grid: true,
-    min: 2000,
-    max: 12000,
-    from: 4000,
-    to: 7000,
-    prefix: '$'
-  });
-
+  
   $(document).ready(function () {
     $('.select2').select2({
       placeholder: 'Choose one',
@@ -237,14 +259,14 @@
                 { "data": "block" },
                 { "data": "storey_range" },
                 { "data": "lease_commence_date" },
+                { "data": "remaining_lease" },
                 // { "data": "flat_model" },
-                // { "data": "remaining_lease" },
               ],
               columnDefs: [
                 { width: '15%', targets: 1 },
                 { width: '10%', targets: 3 },
                 { width: '20%', targets: 6 },
-                { width: '2%', targets: -1 },
+                { width: '2%', targets: -2 },
               ],
               layout: {
                 topStart: null,
@@ -252,7 +274,8 @@
               },
               language: {
                 emptyTable: 'Loading data...' // Change for when no records while searching
-              }
+              },
+              "pageLength": 15,
         });
 
         // Hide loading message and show table
@@ -261,8 +284,14 @@
     });
 
   });
+
+  
 </script>
 <style>
+  .container {
+    max-width: 1550px
+  }
+
   .ui-datepicker-calendar {
     display: none;
   }
