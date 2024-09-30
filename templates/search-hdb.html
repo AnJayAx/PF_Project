@@ -9,136 +9,185 @@
       <h2 class="az-content-title">Comprehensive HDB Data</h2>
       <div class="az-content-label mg-b-5">Select your filters.</div>
       <p class="mg-b-20">Search for data on the type of flat you wish to purchase.</p>
-      
+
       <hr class="mg-y-20">
+
       
-      <div class="row row-sm">
-        <div class="col-lg-6">
-          <p class="mg-b-10">Date Range</p>
-          <div class="row row-sm">
-            <!-- From Date -->
-            <div class="wd-200 mg-b-20">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <div class="input-group-text">
-                    From
+      <div> <!-- Filters -->
+        <div class="row row-sm">
+          <div class="col-lg-6">
+            <p class="mg-b-10">Date Range</p>
+            <div class="row row-sm">
+              <!-- From Date -->
+              <div class="mg-b-20">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      From
+                    </div>
                   </div>
+                  <input id="from-date-input" type="text" class="form-control fc-datepicker" placeholder="MM/YYYY">
                 </div>
-                <input id="from-date-input" type="text" class="form-control fc-datepicker" placeholder="MM/YYYY">
               </div>
-            </div>
-            <!-- To Date -->
-            <div class="wd-200 mg-b-20">
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <div class="input-group-text">
-                    To
+              <!-- To Date -->
+              <div class="mg-b-20">
+                <div class="input-group">
+                  <div class="input-group-prepend">
+                    <div class="input-group-text">
+                      To
+                    </div>
                   </div>
+                  <input id="to-date-input" type="text" class="form-control fc-datepicker" placeholder="MM/YYYY">
                 </div>
-                <input id="to-date-input" type="text" class="form-control fc-datepicker" placeholder="MM/YYYY">
               </div>
-            </div>
-          </div> <!-- Row -->
-        </div> <!-- Col -->
-        <div class="col-lg-3">
-          <p class="mg-b-10">Town</p>
-          <select id="town-input" class="form-control select2">
-            <option label="Choose one"></option>
-            <option value="Firefox">Firefox</option>
-            <option value="Chrome">Chrome</option>
-            <option value="Safari">Safari</option>
-            <option value="Opera">Opera</option>
-            <option value="Internet Explorer">Internet Explorer</option>
-          </select>
-        </div> <!-- Col -->
-        <div class="col-lg-3">
-          <p class="mg-b-10">Flat Type</p>
-          <select id="flat-type-input" class="form-control select2">
-            <option label="Choose one"></option>
-            <option value="Executive">Executive</option>
-            <option value="5 Room">5 Room</option>
-            <option value="4 Room">4 Room</option>
-            <option value="3 Room">3 Room</option>
-            <option value="2 Room">2 Room</option>
-          </select>
-        </div> <!-- Col -->
-      </div> <!-- Row -->
+            </div> <!-- Row -->
+          </div> <!-- Col -->
+          <div class="col-lg-3">
+            <p class="mg-b-10">Town</p>
+            <select id="town-input" class="form-control select2">
+              <option label="Choose one"></option>
+              <option value="Firefox">Firefox</option>
+              <option value="Chrome">Chrome</option>
+              <option value="Safari">Safari</option>
+              <option value="Opera">Opera</option>
+              <option value="Internet Explorer">Internet Explorer</option>
+            </select>
+          </div> <!-- Col -->
+          <div class="col-lg-3">
+            <p class="mg-b-10">Flat Type</p>
+            <select id="flat-type-input" class="form-control select2">
+              <option label="Choose one"></option>
+              <option value="Executive">Executive</option>
+              <option value="5 Room">5 Room</option>
+              <option value="4 Room">4 Room</option>
+              <option value="3 Room">3 Room</option>
+              <option value="2 Room">2 Room</option>
+            </select>
+          </div> <!-- Col -->
+        </div> <!-- Row -->
 
 
 
-      <!-- Price Range Pickers -->
-      <div class="row row-sm">
+        <!-- Price Range Pickers -->
+        <div class="row row-sm">
 
-        <div class="col-lg-6">
-          <p class="mg-b-10">Floor Area Range</p>
-          <input type="text" id="area-range-input" class="rangeslider1" data-extra-classes="irs-modern">
-        </div> <!-- Col-->
+          <div class="col-lg-6">
+            <p class="mg-b-10">Floor Area Range</p>
+            <input type="text" id="area-range-input" class="rangeslider1" data-extra-classes="irs-modern">
+          </div> <!-- Col-->
 
-        <div class="col-lg-6">
-          <p class="mg-b-10">$ / m<sup>2</sup> Range</p>
-          <input type="text" id="price-per-metre-range-input" class="rangeslider2" data-extra-classes="irs-modern">
+          <div class="col-lg-6">
+            <p class="mg-b-10">$ / m<sup>2</sup> Range</p>
+            <input type="text" id="price-per-metre-range-input" class="rangeslider2" data-extra-classes="irs-modern">
+          </div>
+        </div> <!-- Row -->
+
+        <div class="row row-sm">
+          <div class="col-lg-12">
+            <p class="mg-b-10">Resale Price Range</p>
+            <input type="text" id="price-range-input" class="rangeslider1" data-extra-classes="irs-modern">
+          </div> <!-- Col-->
+        </div> <!-- Row -->
+
+        <!-- Town Address-->
+        <div class="row row-sm mg-y-20 wd-1000">
+          <div class="col-lg">
+            <p class="mg-b-10">Street Name</p>
+            <input class="form-control" placeholder="Enter a street name" type="text">
+          </div> <!-- Col-->
+          <div class="col-lg">
+            <p class="mg-b-10">Block</p>
+            <input class="form-control" placeholder="Enter a block" type="text">
+          </div> <!-- Col-->
+          <div class="col-lg">
+            <p class="mg-b-10">Storey Range</p>
+            <div class="row row-sm">
+              <div class="col-lg">
+                <input class="form-control" placeholder="00" type="text">
+              </div><!-- Col-->
+              <span style="display:inline-block; padding-top:10px;">-</span>
+              <div class="col-lg">
+                <input class="form-control" placeholder="00" type="text">
+              </div> <!-- Col-->
+            </div> <!-- Row -->
+          </div> <!-- Col-->
+        </div> <!-- Row -->
+
+        <div class="row row-sm wd-600">
+          <div class="col-lg">
+            <p class="mg-b-10">Lease Commencement Date</p>
+            <input class="form-control" placeholder="Enter a year" type="text">
+          </div>
+          <div class="col-lg">
+            <p class="mg-b-10">Remaining Lease</p>
+            <div class="row" style="flex-wrap: nowrap;">
+              <div class="col-sm-6">
+                <input class="form-control" placeholder="Years" type="text">
+              </div>
+              <span style="display:inline-block; padding-top:10px;">&</span>
+              <div class="col-sm-6">
+                <input class="form-control" placeholder="Months" type="text">
+              </div>
+            </div> <!-- Row for Years and Months-->
+          </div> <!-- Col-->
+        </div> <!-- Row -->
+
+        <!-- Action Buttons-->
+        <div class="row row-sm mg-y-20">
+          <div class="text-right ml-auto"><button class="btn btn-secondary">Clear All Filters</button></div>
+          <div class="text-right"><button class="btn btn-primary">Apply</button></div>
         </div>
+        
+      </div> <!-- Filters End -->
 
-      </div> <!-- Row -->
+      <hr class="mg-y-20">
 
-      <div class="row row-sm">
-        <div class="col-lg-12">
-          <p class="mg-b-10">Resale Price Range</p>
-          <input type="text" id="price-range-input" class="rangeslider1" data-extra-classes="irs-modern">
-        </div> <!-- Col-->
-      </div> <!-- Row -->
+      <!-- <div id="loading">Loading data, please wait...</div> -->
+      <div class="table-responsive">
+        <table id="main-table" class="hover stripe row-border dataTable" style="display: inline-block; overflow: auto;">
+          <thead>
+            <tr>
+              <th style="position: sticky; top: 0; background-color: white;">Month</th>
+              <th data-dt-order="disable" style="position: sticky; top: 0; background-color: white;">Town</th>
+              <th style="position: sticky; top: 0; background-color: white;">Flat Type</th>
+              <th style="position: sticky; top: 0; background-color: white;">Floor Area (m<sup>2</sup>)</th>
+              <th style="position: sticky; top: 0; background-color: white;">Resale Price</th>
+              <th style="position: sticky; top: 0; background-color: white;">$ / m<sup>2</sup></th>
+              <th data-dt-order="disable" style="position: sticky; top: 0; background-color: white;">Street Name</th>
+              <th data-dt-order="disable" style="position: sticky; top: 0; background-color: white;">Block</th>
+              <th style="position: sticky; top: 0; background-color: white;">Storey Range</th>
+              <!-- <th style="position: sticky; top: 0; background-color: white;">Flat Model</th> -->
+              <th style="position: sticky; top: 0; background-color: white;">Lease Commence Date</th>
+              <th style="position: sticky; top: 0; background-color: white;">Remaining Lease</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in data %}
+            <tr>
+              <td>{{ row["month"] }}</td>
+              <td>{{ row["town"] }}</td>
+              <td>{{ row["flat_type"] }}</td>
+              <td value={{ row["floor_area_sqm"] }}>{{ row["floor_area_sqm"] }}</td>
+              <!-- <td hidden>{{ row["resale_price"] }}</td> -->
+              <td class="currency" value={{ row["resale_price"] }}>{{ row["f_resale_price"] }}</td>
+              <!-- <td hidden>{{ row["price_per_sq_metre"] }}</td> -->
+              <td class="currency" value={{ row["price_per_sq_metre"] }}>{{ row["f_price_per_sq_metre"] }}
+              </td>
+              <td>{{ row["street_name"] }}</td>
+              <td>{{ row["block"] }}</td>
+              <td>{{ row["storey_range"] }}</td>
+              <!-- <td>{{ row["flat_model"] }}</td> -->
+              <td>{{ row["lease_commence_date"] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div><!-- table-responsive -->
 
+      <div class="ht-40"></div>
 
-
-
-  <hr class="mg-y-20">
-
-  <!-- <div id="loading">Loading data, please wait...</div> -->
-  <div class="table-responsive">
-    <table id="main-table" class="hover stripe row-border dataTable" style="display: inline-block; overflow: auto;">
-      <thead>
-        <tr>
-          <th style="position: sticky; top: 0; background-color: white;">Month</th>
-          <th data-dt-order="disable" style="position: sticky; top: 0; background-color: white;">Town</th>
-          <th style="position: sticky; top: 0; background-color: white;">Flat Type</th>
-          <th style="position: sticky; top: 0; background-color: white;">Floor Area (m<sup>2</sup>)</th>
-          <th style="position: sticky; top: 0; background-color: white;">Resale Price</th>
-          <th style="position: sticky; top: 0; background-color: white;">$ / m<sup>2</sup></th>
-          <th data-dt-order="disable" style="position: sticky; top: 0; background-color: white;">Street Name</th>
-          <th data-dt-order="disable" style="position: sticky; top: 0; background-color: white;">Block</th>
-          <th style="position: sticky; top: 0; background-color: white;">Storey Range</th>
-          <!-- <th style="position: sticky; top: 0; background-color: white;">Flat Model</th> -->
-          <th style="position: sticky; top: 0; background-color: white;">Lease Commence Date</th>
-          <th style="position: sticky; top: 0; background-color: white;">Remaining Lease</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in data %}
-        <tr>
-          <td>{{ row["month"] }}</td>
-          <td>{{ row["town"] }}</td>
-          <td>{{ row["flat_type"] }}</td>
-          <td value={{ row["floor_area_sqm"] }}>{{ row["floor_area_sqm"] }}</td>
-          <!-- <td hidden>{{ row["resale_price"] }}</td> -->
-          <td class="currency" value={{ row["resale_price"] }}>{{ row["f_resale_price"] }}</td>
-          <!-- <td hidden>{{ row["price_per_sq_metre"] }}</td> -->
-          <td class="currency" value={{ row["price_per_sq_metre"] }}>{{ row["f_price_per_sq_metre"] }}
-          </td>
-          <td>{{ row["street_name"] }}</td>
-          <td>{{ row["block"] }}</td>
-          <td>{{ row["storey_range"] }}</td>
-          <!-- <td>{{ row["flat_model"] }}</td> -->
-          <td>{{ row["lease_commence_date"] }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div><!-- table-responsive -->
-
-  <div class="ht-40"></div>
-
-</div><!-- az-content-body -->
-</div><!-- container -->
+    </div><!-- az-content-body -->
+  </div><!-- container -->
 </div><!-- az-content -->
 
 <script>
@@ -214,16 +263,16 @@
     ],
     layout: {
       topStart: {
-          buttons: [{extend: 'colvis', text: 'Show/Hide Columns'}]
-        },
+        buttons: [{ extend: 'colvis', text: 'Show/Hide Columns' }]
+      },
       topEnd: null,
     },
     language: {
-        emptyTable: 'Loading data...'
+      emptyTable: 'Loading data...'
     },
     "pageLength": 15,
   });
-  
+
   $(document).ready(function () {
     $('.select2').select2({
       placeholder: 'Choose one',
@@ -237,59 +286,59 @@
 
     var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-    socket.on('data_ready', function(msg) {
-        console.log(msg.message);  // Log the message from the server
-        table.destroy();
+    socket.on('data_ready', function (msg) {
+      console.log(msg.message);  // Log the message from the server
+      table.destroy();
 
-        // Initialize DataTables after receiving the signal
-        $('#main-table').DataTable({
-            "processing": true,
-            "serverSide": true,
-            "ajax": {
-                "url": "/get_data",
-                "type": "GET"
-            },
-            "columns": [
-                // { "data": "_id" },
-                { "data": "month" },
-                { "data": "town" },
-                { "data": "flat_type" },
-                { "data": "floor_area_sqm" },
-                { "data": "f_resale_price" },
-                { "data": "f_price_per_sq_metre" },
-                { "data": "street_name" },
-                { "data": "block" },
-                { "data": "storey_range" },
-                { "data": "lease_commence_date" },
-                { "data": "remaining_lease" },
-                // { "data": "flat_model" },
-              ],
-              columnDefs: [
-                { width: '15%', targets: 1 },
-                { width: '10%', targets: 3 },
-                { width: '20%', targets: 6 },
-                { width: '2%', targets: -2 },
-              ],
-              layout: {
-                topStart: {
-                  buttons: [{extend: 'colvis', text: 'Show/Hide Columns'}]
-                },
-                topEnd: null,
-              },
-              language: {
-                emptyTable: 'Loading data...' // Change for when no records while searching
-              },
-              "pageLength": 15,
-        });
+      // Initialize DataTables after receiving the signal
+      $('#main-table').DataTable({
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+          "url": "/get_data",
+          "type": "GET"
+        },
+        "columns": [
+          // { "data": "_id" },
+          { "data": "month" },
+          { "data": "town" },
+          { "data": "flat_type" },
+          { "data": "floor_area_sqm" },
+          { "data": "f_resale_price" },
+          { "data": "f_price_per_sq_metre" },
+          { "data": "street_name" },
+          { "data": "block" },
+          { "data": "storey_range" },
+          { "data": "lease_commence_date" },
+          { "data": "remaining_lease" },
+          // { "data": "flat_model" },
+        ],
+        columnDefs: [
+          { width: '15%', targets: 1 },
+          { width: '10%', targets: 3 },
+          { width: '20%', targets: 6 },
+          { width: '2%', targets: -2 },
+        ],
+        layout: {
+          topStart: {
+            buttons: [{ extend: 'colvis', text: 'Show/Hide Columns' }]
+          },
+          topEnd: null,
+        },
+        language: {
+          emptyTable: 'Loading data...' // Change for when no records while searching
+        },
+        "pageLength": 15,
+      });
 
-        // Hide loading message and show table
-        $('#loading').hide();
-        $('#main-table').show();
+      // Hide loading message and show table
+      $('#loading').hide();
+      $('#main-table').show();
     });
 
   });
 
-  
+
 </script>
 <style>
   .container {
