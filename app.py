@@ -48,7 +48,7 @@ login_manager.init_app(app)
 
 # Table DataFrames
 df_api_data = pd.DataFrame()
-df_older_data = pd.read_csv(path + '/static/csv/ResaleFlatPrices1990-2016.csv')
+df_older_data = pd.read_csv(path + '/static/csv/ResaleFlatPrices1990-2016.csv', low_memory=False)
 
 def fetch_data_from_api():
     completeAPICall = False
@@ -255,6 +255,32 @@ def get_data():
     }
 
     return jsonify(response)
+
+@app.route('/filter-data', methods=['POST'])
+def filter_data():
+    data = request.json
+    print("Data received is as such: ")
+    print(data)
+
+    #error validation not working... going to sleep zzz
+
+    errors = []
+    try:
+        if data["remaining_lease"]["year"] != "":
+            rem_lease_year = int(data["remaining_lease"]["year"])
+        if data["remaining_lease"]["months"] != "":
+            rem_lease_months = int(data["remaining_lease"]["months"])
+        if data["storey"]["from"] != "":
+            storey_from = int(data["storey"]["from"])
+        if data["storey"]["to"] != "":
+            storey_to = int(data["storey"]["to"])
+        if data["lease_date"] != "":
+            lease_date = int(data["lease_date"])
+    except:
+        errors.append("Please enter valid numbers.")
+        return errors
+
+    return jsonify(data)
 
 @app.route('/search-hdb', methods=['GET', 'POST'])
 def search_hdb():

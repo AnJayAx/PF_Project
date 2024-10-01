@@ -7,3 +7,5 @@ pip install --upgrade numpy==1.23.1\
 pip install joblib\
 pip install pandas\
 pip install flask-socketio\
+
+Run via terminal command: python -m flask --debug  run

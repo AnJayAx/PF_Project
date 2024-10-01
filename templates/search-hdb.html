@@ -26,7 +26,7 @@
                       From
                     </div>
                   </div>
-                  <input id="from-date-input" type="text" class="form-control fc-datepicker" placeholder="MM/YYYY">
+                  <input id="date-from-input" type="text" class="form-control fc-datepicker" placeholder="MM/YYYY">
                 </div>
               </div>
               <!-- To Date -->
@@ -37,7 +37,7 @@
                       To
                     </div>
                   </div>
-                  <input id="to-date-input" type="text" class="form-control fc-datepicker" placeholder="MM/YYYY">
+                  <input id="date-to-input" type="text" class="form-control fc-datepicker" placeholder="MM/YYYY">
                 </div>
               </div>
             </div> <!-- Row -->
@@ -45,12 +45,33 @@
           <div class="col-lg-3">
             <p class="mg-b-10">Town</p>
             <select id="town-input" class="form-control select2">
-              <option label="Choose one"></option>
-              <option value="Firefox">Firefox</option>
-              <option value="Chrome">Chrome</option>
-              <option value="Safari">Safari</option>
-              <option value="Opera">Opera</option>
-              <option value="Internet Explorer">Internet Explorer</option>
+              <option label="Choose one"></option> 
+              <option value="Sengkang">Sengkang</option>
+              <option value="Geylang">Geylang</option>
+              <option value="Punggol">Punggol</option>
+              <option value="Hougang">Hougang</option>
+              <option value="Pasir Ris">Pasir Ris</option>
+              <option value="Woodlands">Woodlands</option>
+              <option value="Yishun">Yishun</option>
+              <option value="Tampines">Tampines</option>
+              <option value="Jurong West">Jurong West</option>
+              <option value="Jurong East">Jurong East</option>
+              <option value="Bedok">Bedok</option>
+              <option value="Choa Chu Kang">Choa Chu Kang</option>
+              <option value="Toa Payoh">Toa Payoh</option>
+              <option value="Bishan">Bishan</option>
+              <option value="Ang Mo Kio">Ang Mo Kio</option>
+              <option value="Serangoon">Serangoon</option>
+              <option value="Bukit Batok">Bukit Batok</option>
+              <option value="Bukit Merah">Bukit Merah</option>
+              <option value="Bukit Panjang">Bukit Panjang</option>
+              <option value="Bukit Timah">Bukit Timah</option>
+              <option value="Kallang/Whampoa">Kallang/Whampoa</option>
+              <option value="Sembawang">Sembawang</option>
+              <option value="Clementi">Clementi</option>
+              <option value="Queenstown">Queenstown</option>
+              <option value="Central Area">Central Area</option>
+              <option value="Marine Parade">Marine Parade</option>
             </select>
           </div> <!-- Col -->
           <div class="col-lg-3">
@@ -62,13 +83,15 @@
               <option value="4 Room">4 Room</option>
               <option value="3 Room">3 Room</option>
               <option value="2 Room">2 Room</option>
+              <option value="1 Room">1 Room</option>
+              <option value="Multi-Generation">Multi-Generation</option>
             </select>
           </div> <!-- Col -->
         </div> <!-- Row -->
 
 
 
-        <!-- Price Range Pickers -->
+        <!-- Range Pickers -->
         <div class="row row-sm">
 
           <div class="col-lg-6">
@@ -93,21 +116,21 @@
         <div class="row row-sm mg-y-20 wd-1000">
           <div class="col-lg">
             <p class="mg-b-10">Street Name</p>
-            <input class="form-control" placeholder="Enter a street name" type="text">
+            <input id="street-name-input" class="form-control" placeholder="Enter a street name" type="text">
           </div> <!-- Col-->
           <div class="col-lg">
             <p class="mg-b-10">Block</p>
-            <input class="form-control" placeholder="Enter a block" type="text">
+            <input id="block-input" class="form-control" placeholder="Enter a block" type="text">
           </div> <!-- Col-->
           <div class="col-lg">
             <p class="mg-b-10">Storey Range</p>
             <div class="row row-sm">
               <div class="col-lg">
-                <input class="form-control" placeholder="00" type="text">
+                <input id="storey-from-input"class="form-control" placeholder="00" type="text">
               </div><!-- Col-->
               <span style="display:inline-block; padding-top:10px;">-</span>
               <div class="col-lg">
-                <input class="form-control" placeholder="00" type="text">
+                <input id="storey-to-input" class="form-control" placeholder="00" type="text">
               </div> <!-- Col-->
             </div> <!-- Row -->
           </div> <!-- Col-->
@@ -116,17 +139,17 @@
         <div class="row row-sm wd-600">
           <div class="col-lg">
             <p class="mg-b-10">Lease Commencement Date</p>
-            <input class="form-control" placeholder="Enter a year" type="text">
+            <input id="lease-date-input" class="form-control" placeholder="Enter a year" type="text">
           </div>
           <div class="col-lg">
             <p class="mg-b-10">Remaining Lease</p>
             <div class="row" style="flex-wrap: nowrap;">
               <div class="col-sm-6">
-                <input class="form-control" placeholder="Years" type="text">
+                <input id="remlease-years-input" class="form-control" placeholder="Years" type="text">
               </div>
               <span style="display:inline-block; padding-top:10px;">&</span>
               <div class="col-sm-6">
-                <input class="form-control" placeholder="Months" type="text">
+                <input id="remlease-months-input" class="form-control" placeholder="Months" type="text">
               </div>
             </div> <!-- Row for Years and Months-->
           </div> <!-- Col-->
@@ -134,10 +157,10 @@
 
         <!-- Action Buttons-->
         <div class="row row-sm mg-y-20">
-          <div class="text-right ml-auto"><button class="btn btn-secondary">Clear All Filters</button></div>
-          <div class="text-right"><button class="btn btn-primary">Apply</button></div>
+          <div class="text-right ml-auto"><button id="reset-filters"class="btn btn-secondary">Reset All Filters</button></div>
+          <div class="text-right"><button id="apply-filters" class="btn btn-primary">Apply</button></div>
         </div>
-        
+
       </div> <!-- Filters End -->
 
       <hr class="mg-y-20">
@@ -193,6 +216,7 @@
 <script>
   // Datepicker
   $('.fc-datepicker').datepicker({
+    minDate: new Date(1990, 1 -1, 1), // doesnt work... grrr
     showOtherMonths: true,
     selectOtherMonths: true,
     changeMonth: true,
@@ -209,8 +233,8 @@
     grid: true,
     min: 0,
     max: 1300000,
-    from: 300000,
-    to: 700000,
+    from: 0,
+    to: 1300000,
     prefix: '$'
   });
 
@@ -219,8 +243,8 @@
     grid: true,
     min: 2000,
     max: 12000,
-    from: 4000,
-    to: 7000,
+    from: 2000,
+    to: 12000,
     prefix: '$'
   });
 
@@ -229,8 +253,8 @@
     grid: true,
     min: 0,
     max: 160,
-    from: 30,
-    to: 50,
+    from: 0,
+    to: 160,
     prefix: ''
   });
 
@@ -273,21 +297,92 @@
     "pageLength": 15,
   });
 
+  // Document Ready Function ----
   $(document).ready(function () {
     $('.select2').select2({
       placeholder: 'Choose one',
-      searchInputPlaceholder: 'Search'
     });
 
     $('.select2-no-search').select2({
-      minimumResultsForSearch: Infinity,
       placeholder: 'Choose one'
     });
+
+    $('reset-filters').click(function(){
+      console.log("reset clicked")
+
+    })
+
+    $('#apply-filters').click(function() {
+      console.log("apply clicked")
+
+      date = {
+        "from": $('#date-from-input').val(),
+        "to": $('#date-to-input').val()
+      }
+      floor_area = {
+        "from": $('#area-range-input').data("from"),
+        "to": $('#area-range-input').data("to")
+      }
+      resale_price = {
+        "from": $('#price-range-input').data("from"),
+        "to": $('#price-range-input').data("to")
+      }
+      price_per_m = {
+        "from": $('#price-per-metre-range-input').data("from"),
+        "to": $('#price-per-metre-range-input').data("to")
+      }
+      storey = {
+        "from": document.getElementById("storey-from-input").value,
+        "to": document.getElementById("storey-to-input").value
+      }
+      remaining_lease = {
+        "years": $('#remlease-years-input').val(),
+        "months": $('#remlease-months-input').val()
+      }
+      town = document.getElementById("town-input").value
+      flat_type = document.getElementById("flat-type-input").value
+      street_name = document.getElementById("street-name-input").value
+      block = document.getElementById("block-input").value
+      lease_date = document.getElementById("lease-date-input").value
+
+      data = {
+        date : date,
+        floor_area : floor_area,
+        resale_price : resale_price,
+        price_per_m : price_per_m,
+        town : town,
+        flat_type : flat_type,
+        street_name : street_name,
+        block : block,
+        lease_date : lease_date,
+        remaining_lease : remaining_lease,
+        storey: storey
+      }
+
+      console.log(document.getElementById("town-input").value)
+
+      $.ajax({
+        url: "/filter-data",
+        type: "POST",
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function (response) {
+            console.log("Success! ", response)
+        },
+        error: function (error) {
+            console.error('Error: ', error);
+        }
+      })
+    })
+
+    $('#reset-filters').click(function() {
+      console.log("reset clicked")
+    })
 
     var socket = io.connect('http://' + document.domain + ':' + location.port);
 
     socket.on('data_ready', function (msg) {
-      console.log(msg.message);  // Log the message from the server
+      console.log(msg.message); 
       table.destroy();
 
       // Initialize DataTables after receiving the signal
