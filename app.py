@@ -49,6 +49,7 @@ login_manager.init_app(app)
 # Table DataFrames
 df_api_data = pd.DataFrame()
 df_older_data = pd.read_csv(path + '/static/csv/ResaleFlatPrices1990-2016.csv', low_memory=False)
+df_filtered = pd.DataFrame()
 
 def fetch_data_from_api():
     completeAPICall = False
@@ -237,6 +238,11 @@ def get_data():
     # Uses older data into the table until api data is fully retrieved. Then use that.
     if not df_api_data.empty:
         df_to_use = df_api_data
+    
+    if not df_filtered.empty:
+        df_to_use = df_filtered
+        
+        print("using filtered data")
 
     # Total number of records in the DataFrame
     total_records = len(df_to_use)
@@ -261,26 +267,57 @@ def filter_data():
     data = request.json
     print("Data received is as such: ")
     print(data)
+    global df_filtered
+    df_filtered = df_api_data
+    
+    # DF Cols:
+    # _id,month,town,flat_type,block,street_name,storey_range,
+    # floor_area_sqm,flat_model,lease_commence_date,resale_price,
+    # remaining_lease,price_per_sq_metre,f_resale_price,f_price_per_sq_metre
+    
+    #print(df_filtered.dtypes)
+    for key, value in data.items():
+        # Handle the monath
+        if key == "month":
+            frods = value.get("from", "")
+            tods = value.get("to", "")
 
-    #error validation not working... going to sleep zzz
+            if frods and tods:  # Both from and to are specified
+                from_val = pd.to_datetime(frods, format='%B %Y', errors='coerce') 
+                to_val = pd.to_datetime(tods, format='%B %Y', errors='coerce') 
 
-    errors = []
-    try:
-        if data["remaining_lease"]["year"] != "":
-            rem_lease_year = int(data["remaining_lease"]["year"])
-        if data["remaining_lease"]["months"] != "":
-            rem_lease_months = int(data["remaining_lease"]["months"])
-        if data["storey"]["from"] != "":
-            storey_from = int(data["storey"]["from"])
-        if data["storey"]["to"] != "":
-            storey_to = int(data["storey"]["to"])
-        if data["lease_date"] != "":
-            lease_date = int(data["lease_date"])
-    except:
-        errors.append("Please enter valid numbers.")
-        return errors
+                df_filtered[key] = pd.to_datetime(df_filtered[key], format='%Y-%m', errors='coerce')
+                df_filtered = df_filtered.dropna(subset=[key])
+                df_filtered = df_filtered[(df_filtered[key] >= from_val) & (df_filtered[key] <= to_val)]
+                df_filtered[key] = df_filtered[key].dt.strftime('%Y-%m') # Convert back to formmated for front-end
+        else:
+            # Handle range queries
+            if "from" in value:
+                from_val = value.get("from", "")
+                to_val = value.get("to", "")
 
-    return jsonify(data)
+                if from_val and to_val:  # Both from and to are specified
+                    df_filtered[key] = pd.to_numeric(df_filtered[key], errors='coerce')
+                    df_filtered = df_filtered.dropna(subset=[key])
+                    df_filtered = df_filtered[(df_filtered[key] >= float(from_val)) & (df_filtered[key] <= float(to_val))]
+                elif from_val:  # Only 'from' specified
+                    df_filtered[key] = pd.to_numeric(df_filtered[key], errors='coerce')
+                    df_filtered = df_filtered.dropna(subset=[key])
+                    df_filtered = df_filtered[df_filtered[key] >= float(from_val)]
+                elif to_val:  # Only 'to' specified
+                    df_filtered[key] = pd.to_numeric(df_filtered[key], errors='coerce')
+                    df_filtered = df_filtered.dropna(subset=[key])
+                    df_filtered = df_filtered[df_filtered[key] <= float(to_val)]
+        
+            # Handle exact matches for strings
+            elif isinstance(value, str) and value.strip() != "":
+                df_filtered = df_filtered[df_filtered[key] == value.upper()]
+
+    # If no results are found, they use the api data. Should show some message about there not being any results.
+    print(df_filtered)
+    #df_filtered['month'] = df_filtered['month'].dt.strftime('%Y-%m')
+
+    return jsonify({"success": True}), 200
 
 @app.route('/search-hdb', methods=['GET', 'POST'])
 def search_hdb():
