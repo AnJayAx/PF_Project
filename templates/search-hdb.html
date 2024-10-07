@@ -12,7 +12,6 @@
 
       <hr class="mg-y-20">
 
-
       <div> <!-- Filters -->
         <div class="row row-sm">
           <div class="col-lg-6">
@@ -96,19 +95,21 @@
 
           <div class="col-lg-6">
             <p class="mg-b-10">Floor Area Range</p>
-            <input type="text" id="area-range-input" class="rangeslider1" data-extra-classes="irs-modern">
+            <input type="text" id="area-range-input" class="rangeslider1 range-control" data-extra-classes="irs-modern">
           </div> <!-- Col-->
 
           <div class="col-lg-6">
             <p class="mg-b-10">$ / m<sup>2</sup> Range</p>
-            <input type="text" id="price-per-metre-range-input" class="rangeslider2" data-extra-classes="irs-modern">
+            <input type="text" id="price-per-metre-range-input" class="rangeslider2 range-control"
+              data-extra-classes="irs-modern">
           </div>
         </div> <!-- Row -->
 
         <div class="row row-sm">
           <div class="col-lg-12">
             <p class="mg-b-10">Resale Price Range</p>
-            <input type="text" id="price-range-input" class="rangeslider1" data-extra-classes="irs-modern">
+            <input type="text" id="price-range-input" class="rangeslider1 range-control"
+              data-extra-classes="irs-modern">
           </div> <!-- Col-->
         </div> <!-- Row -->
 
@@ -154,7 +155,6 @@
             </div> <!-- Row for Years and Months-->
           </div> <!-- Col-->
         </div> <!-- Row -->
-
         <!-- Action Buttons-->
         <div class="row row-sm mg-y-20">
           <div class="text-right ml-auto"><button id="reset-filters" class="btn btn-secondary">Reset All
@@ -229,7 +229,11 @@
     }
   });
 
-  $('#price-range-input').ionRangeSlider({
+  var $d1 = $('#price-range-input')
+  var $d2 = $('#price-per-metre-range-input')
+  var $d3 = $('#area-range-input')
+
+  $d1.ionRangeSlider({
     type: 'double',
     grid: true,
     min: 0,
@@ -239,7 +243,7 @@
     prefix: '$'
   });
 
-  $('#price-per-metre-range-input').ionRangeSlider({
+  $d2.ionRangeSlider({
     type: 'double',
     grid: true,
     min: 0,
@@ -249,7 +253,7 @@
     prefix: '$'
   });
 
-  $('#area-range-input').ionRangeSlider({
+  $d3.ionRangeSlider({
     type: 'double',
     grid: true,
     min: 0,
@@ -305,12 +309,53 @@
       placeholder: 'Choose one',
     });
 
-    $('.select2-no-search').select2({
-      placeholder: 'Choose one'
-    });
+    $('#reset-filters').click(function () {
+      //console.log("reset clicked")
+      //document.getElementById("filter-form").reset()
 
-    $('reset-filters').click(function () {
-      console.log("reset clicked")
+      form_controls = document.getElementsByClassName("form-control")
+      range_controls = document.getElementsByClassName("range-control")
+
+      // Reset text fields
+      for (let i = 0; i < form_controls.length; i++) {
+        form_controls[i].value = ""
+      }
+
+      // Reset placeholders for select class
+      $('#town-input').val(null)
+      $('#flat-type-input').val(null)
+
+      // Reset the annoying ionrangesliders
+      var d1_instance = $d1.data('ionRangeSlider')
+      var d2_instance = $d2.data('ionRangeSlider')
+      var d3_instance = $d3.data('ionRangeSlider')
+
+      d1_instance.update({
+        from: 0,
+        to: 2000000,
+      });
+
+      d2_instance.update({
+        from: 0,
+        to: 20000,
+      });
+
+      d3_instance.update({
+        from: 0,
+        to: 200,
+      });
+
+      $.ajax({
+        url: '/reset-filters',
+        type: 'POST',
+        success: function (response) {
+          console.log(response.message);
+          $('#main-table').DataTable().ajax.reload();
+        },
+        error: function (xhr, status, error) {
+          console.error('Error clearing filters:', error);
+        }
+      });
 
     })
 
@@ -429,9 +474,7 @@
       })
     })
 
-    $('#reset-filters').click(function () {
-      console.log("reset clicked")
-    })
+
 
     var socket = io.connect('http://' + document.domain + ':' + location.port);
 

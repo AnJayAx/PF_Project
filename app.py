@@ -262,6 +262,12 @@ def get_data():
 
     return jsonify(response)
 
+@app.route("/reset-filters", methods=["POST"])
+def reset_filters():
+    global df_filtered
+    df_filtered = pd.DataFrame()  #clear filters
+    return jsonify({"message": "Filters cleared"}), 200
+
 @app.route('/filter-data', methods=['POST'])
 def filter_data():
     data = request.json
