@@ -16,7 +16,7 @@
                     <!-- Input Section (Yellow Side) -->
                     <div class="input-section">
                         <div class="mg-b-20">
-                            <p class="mg-b-10">Targeted Month - Year</p>
+                            <p class="mg-b-10">Targeted Year - Month</p>
                             <div class="input-group full-width">
                                 <div class="input-group-prepend">
                                     <div class="input-group-text">
@@ -69,37 +69,38 @@
                             </select>
                         </div>
 
-                        {#                        <div class="mg-b-20">#}
-                        {#                            <p class="mg-b-10">Floor Area (sqm)</p>#}
-                        {#                            <input id="floor-area" class="form-control" placeholder="Numbers Only" type="text" required>#}
-                        {#                        </div>#}
-                        {##}
-                        {#                        <div class="mg-b-20">#}
-                        {#                            <p class="mg-b-10">Lease Commence Year</p>#}
-                        {#                            <select id="year" class="form-control select2-no-search full-width" required>#}
-                        {#                                <!-- Options will be populated by JavaScript -->#}
-                        {#                            </select>#}
-                        {#                        </div>#}
-                        {##}
-                        {#                        <div class="mg-b-20">#}
-                        {#                            <p class="mg-b-10">Max Floor Level</p>#}
-                        {#                            <select id="floor-select" class="form-control select2 full-width" required>#}
-                        {#                                <option label="1 - 50 Max"></option>#}
-                        {#                                <!-- Options will be populated by JavaScript -->#}
-                        {#                            </select>#}
-                        {#                        </div>#}
-
                         <!-- Submit button (full width) -->
                         <button type="button" id="predictButton" class="btn btn-primary submit-btn full-width">Predict
                         </button>
                     </div>
 
-                    <!-- Output Section (Red Side) -->
+                    <!-- Output Section -->
                     <div class="output-section" id="result-box">
-                        <!-- Empty initially; will be updated dynamically -->
+                        <div class="user-inputs">
+                            <div class="input-box-predict">
+                                <h5>Town: <span id="display-town"></span></h5>
+                                <h5>Block: <span id="display-block"></span></h5>
+                                <h5>Street Name: <span id="display-street"></span></h5>
+                                <h5>Flat Type: <span id="display-flat_type"></span></h5>
+                                <h5>Storey Range: <span id="display-storey_range"></span></h5>
+                            </div>
+                        </div>
                         <div id="price-prediction" class="price-prediction">
-                            <!-- Placeholder for the price prediction -->
+                            <!-- Predicted price will be inserted here -->
+                            <h3>Predicted Price for <span id="target-year-month"></span></h3>
+                            <h3><span id="predicted-price">$XX,XXX</span></h3>
+                        </div>
 
+                        <!-- Additional charts or information boxes -->
+                        <div class="chart-box">
+                            <div class="az-content-label mg-b-5">Past and Future Resale Price</div>
+                            <p class="mg-b-20">Chart below shows the past and predicted resale price for predicted address.</p>
+                            <div class="chartjs-wrapper-demo">
+                                <canvas id="chartLine1"></canvas>
+                            </div>
+                        </div>
+                        <div class="chart-box">
+                            <h5>Chart or Info Box 2</h5>
                         </div>
                     </div>
                 </div>
@@ -109,20 +110,59 @@
 
     <script>
         $(document).ready(function () {
+            // Initialize Select2 dropdowns
             $('.select2').select2({
                 placeholder: 'Choose one',
                 width: '100%' // Ensure Select2 takes up 100% width
             });
 
+            // Chart reference
+            var chart;
+
+            // Initialize the chart with placeholder data
+            const ctx = document.getElementById('chartLine1').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022'], // Example initial labels
+                    datasets: [{
+                        label: 'Resale Prices',
+                        data: [400000, 420000, 450000], // Example initial data
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        fill: true,
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Year'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Price'
+                            },
+                            beginAtZero: false
+                        }
+                    }
+                }
+            });
+
+            // When the user selects a town
             $('#town-select').on('change', function () {
                 const selectedTown = $(this).val();
-                console.log('Selected Town:', selectedTown);  // Debugging line
+                console.log('Selected Town:', selectedTown);
 
-                // Make an AJAX call to get blocks for the selected town
+                // Fetch blocks for the selected town
                 fetch(`/get_blocks/${selectedTown}`)
                     .then(response => response.json())
                     .then(data => {
-                        console.log('Blocks received:', data.blocks);  // Debugging line
+                        console.log('Blocks received:', data.blocks);
                         var blockSelect = $('#block-select');
                         blockSelect.empty().append('<option label="Choose one"></option>'); // Clear current options
                         blockSelect.prop('disabled', false); // Enable block dropdown
@@ -135,19 +175,20 @@
                     .catch(error => console.error('Error fetching blocks:', error));
             });
 
+            // When the user selects a block
             $('#block-select').on('change', function () {
                 const selectedBlock = $(this).val();
                 const selectedTown = $('#town-select').val();
-                console.log('Selected Block:', selectedBlock); // Debugging line
+                console.log('Selected Block:', selectedBlock);
 
-                // Fetch street names based on selected town and block
+                // Fetch street names based on the selected town and block
                 fetch(`/get_streets/${selectedTown}/${selectedBlock}`)
                     .then(response => response.json())
                     .then(data => {
-                        console.log('Streets received:', data.streets); // Debugging line
+                        console.log('Streets received:', data.streets);
                         var streetSelect = $('#street-select');
                         streetSelect.empty().append('<option label="Choose one"></option>'); // Clear current options
-                        streetSelect.prop('disabled', false); // Enable street name dropdown
+                        streetSelect.prop('disabled', false); // Enable street dropdown
 
                         // Populate with new street options
                         data.streets.forEach(function (street) {
@@ -157,16 +198,17 @@
                     .catch(error => console.error('Error fetching streets:', error));
             });
 
+            // When the user selects a street
             $('#street-select').on('change', function () {
                 const selectedStreet = $(this).val();
                 const selectedBlock = $('#block-select').val();
-                console.log('Selected Street:', selectedStreet); // Debugging line
+                console.log('Selected Street:', selectedStreet);
 
-                // Fetch flat types based on selected street and block
+                // Fetch flat types based on the selected street and block
                 fetch(`/get_flats/${selectedBlock}/${selectedStreet}`)
                     .then(response => response.json())
                     .then(data => {
-                        console.log('Flat types received:', data.flat_types); // Debugging line
+                        console.log('Flat types received:', data.flat_types);
                         var flatSelect = $('#flat-select');
                         flatSelect.empty().append('<option label="Choose one"></option>'); // Clear current options
                         flatSelect.prop('disabled', false); // Enable flat type dropdown
@@ -192,41 +234,80 @@
                 };
 
                 // Check if any field is empty and show an alert
-                if (!data.month_year) {
-                    alert('Please fill in Targeted Month - Year field.');
-                    return; // Prevent the form from being submitted
-                } else if (!data.town) {
-                    alert('Please fill in Town field.');
-                    return;
-                } else if (!data.block) {
-                    alert('Please fill in Block field.');
-                    return;
-                } else if (!data.street) {
-                    alert('Please fill in Street Name field.');
-                    return;
-                } else if (!data.flat_type) {
-                    alert('Please fill in Flat Type field.');
-                    return;
-                } else if (!data.storey_range) {
-                    alert('Please fill in Storey Range field.');
+                if (!data.month_year || !data.town || !data.block || !data.street || !data.flat_type || !data.storey_range) {
+                    alert('Please fill in all fields.');
                     return;
                 }
 
-                // Send data to Flask using AJAX
+                // Update the HTML placeholders with user inputs
+                $('#display-town').text(data.town);
+                $('#display-block').text(data.block);
+                $('#display-street').text(data.street);
+                $('#display-flat_type').text(data.flat_type);
+                $('#display-storey_range').text(data.storey_range);
+                $('#target-year-month').text(data.month_year);
+
+                // Fetch the predicted price
                 $.ajax({
-                    url: '/prediction',  // URL for the prediction route
+                    url: '/prediction',
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify(data),  // Send the collected data as JSON
+                    data: JSON.stringify(data),
                     success: function (response) {
-                        // If successful, display the predicted price in the output section
-                        $('#price-prediction').html(`<h3>Predicted Price: $${response.predicted_price}</h3>`);
+                        let predictedPrice = response.predicted_price;
+
+                        // Format the predicted price
+                        let formattedPrice = parseFloat(predictedPrice).toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+
+                        // Update the HTML with predicted price
+                        $('#predicted-price').text(`$${formattedPrice}`);
+                        $('#target-year-month').text(data.month_year);
+
+                        // Show the output section
+                        $('.output-section').css('display', 'block');
+
+                        // Fetch historical data with the predicted price included
+                        fetchHistoricalData(data, predictedPrice);
                     },
                     error: function (error) {
-                        console.error('Error predicting price:', error);
+                        console.error('Error fetching predicted price:', error);
                     }
                 });
             });
+
+            // Fetch historical data and update chart
+            function fetchHistoricalData(data, predictedPrice) {
+                // Include the predicted price in the data object
+                data.predicted_price = predictedPrice;
+
+                // Make an AJAX request to get historical data
+                $.ajax({
+                    url: '/get_historical_data',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),  // Send the collected data including predicted price
+                    success: function (response) {
+                        const years = response.years;
+                        const prices = response.prices;
+
+                        // Update the chart with both historical and predicted data
+                        updateChart(years, prices);
+                    },
+                    error: function (error) {
+                        console.error('Error fetching historical data:', error);
+                    }
+                });
+            }
+
+            // Function to update the chart
+            function updateChart(years, prices) {
+                chart.data.labels = years;  // The months/years from historical data
+                chart.data.datasets[0].data = prices;  // Historical prices + predicted price
+                chart.update();  // Redraw the chart with the new data
+            }
         });
     </script>
     <script>
@@ -270,7 +351,7 @@
             });
 
             // Initialize datepicker with month and year only
-            const myDate = $("#datetimepicker").attr('data-date');
+            const myDate = new Date();  // Use the current date by default
             $('#datetimepicker').datepicker({
                 dateFormat: 'MM yy', // Show only month and year
                 changeMonth: true,   // Enable month dropdown
@@ -297,9 +378,8 @@
                 }
             });
 
-            // Set the initial date
+            // Set the initial date to current date
             $('#datetimepicker').datepicker('setDate', myDate);
-
 
         });
     </script>
@@ -318,8 +398,17 @@
         }
 
         .output-section {
-            width: 49%; /* Output section also takes slightly less than half of the width */
+            width: 45%; /* Set width for output section */
+            border: 1px solid gray; /* Gray border */
             text-align: center;
+            padding: 10px;
+            display: none;
+        }
+
+        .user-inputs {
+            border: 1px solid gray;
+            margin-bottom: 10px;
+            text-align: left;
         }
 
         /* Make input fields and button stretch to full width */
@@ -334,13 +423,25 @@
 
         /* Output section text styling */
         .price-prediction {
+            border: 1px solid gray;
+            padding: 20px;
+            margin-bottom: 10px;
             font-size: 24px;
             font-weight: bold;
         }
 
+        /* Chart / Info boxes */
+        .chart-box {
+            border: 1px solid gray;
+            padding: 20px;
+            margin: 10px 0;
+        }
+
         /* Reduced gap between input and output sections */
         .d-flex {
-            gap: 10px; /* Small gap between the two sections */
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
         }
 
         /* Hide the calendar */
@@ -407,6 +508,7 @@
         .ui-datepicker-buttonpane button:hover {
             background-color: #0056b3;
         }
+
 
     </style>
 

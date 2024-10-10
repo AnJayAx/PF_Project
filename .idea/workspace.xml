@@ -4,16 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3b583d00-72f2-4aca-88d9-62ddda72b3ab" name="Changes" comment="Added Bootstrap files">
-      <change afterPath="$PROJECT_DIR$/templates/prediction.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/PF_Project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/PF_Project.iml" afterDir="false" />
+    <list default="true" id="3b583d00-72f2-4aca-88d9-62ddda72b3ab" name="Changes" comment="A much more accurate model added">
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/lib/pickerjs/picker.common.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/lib/pickerjs/picker.common.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/css/azia.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/azia.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/csv/ResaleFlatPrices.csv" beforeDir="false" afterPath="$PROJECT_DIR$/static/csv/ResaleFlatPrices.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/prediction/resale_model_updated.h5" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/includes/_navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/includes/_navbar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/prediction.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/prediction.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -70,22 +69,29 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;Flask server.PF_Project.executor&quot;: &quot;Run&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/SIT/INF1002 Prog Fund/Project/PF_Project&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Flask server.PF_Project.executor": "Run",
+    "git-widget-placeholder": "master",
+    "last_opened_file_path": "D:/SIT/INF1002 Prog Fund/Project/PF_Project/static/csv",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\SIT\INF1002 Prog Fund\Project\PF_Project\static\csv" />
+      <recent name="D:\SIT\INF1002 Prog Fund\Project\PF_Project\static\prediction" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\SIT\INF1002 Prog Fund\Project\PF_Project\static\prediction" />
+      <recent name="D:\SIT\INF1002 Prog Fund\Project\PF_Project\static\csv" />
       <recent name="D:\SIT\INF1002 Prog Fund\Project\PF_Project\templates\Bootstrap" />
     </key>
   </component>
@@ -122,9 +128,8 @@
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <option name="SDK_HOME" value="" />
-      <option name="SDK_NAME" value="Python 3.12 (SIT Materials)" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
@@ -164,7 +169,19 @@
       <workItem from="1726301877110" duration="580000" />
       <workItem from="1727275819291" duration="25000" />
       <workItem from="1727275845024" duration="11213000" />
-      <workItem from="1727320586850" duration="21183000" />
+      <workItem from="1727320586850" duration="22574000" />
+      <workItem from="1727393156349" duration="289000" />
+      <workItem from="1727449138533" duration="13817000" />
+      <workItem from="1727465095337" duration="1242000" />
+      <workItem from="1727495809755" duration="11005000" />
+      <workItem from="1727581777034" duration="1129000" />
+      <workItem from="1727689578067" duration="996000" />
+      <workItem from="1727891640652" duration="1293000" />
+      <workItem from="1727938682553" duration="1411000" />
+      <workItem from="1727945352116" duration="603000" />
+      <workItem from="1728391122278" duration="1475000" />
+      <workItem from="1728473945431" duration="16207000" />
+      <workItem from="1728535982326" duration="17318000" />
     </task>
     <task id="LOCAL-00001" summary="2nd Commit Test">
       <option name="closed" value="true" />
@@ -190,7 +207,31 @@
       <option name="project" value="LOCAL" />
       <updated>1726148427128</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Added Predict Sale Price Page and form for prediction.">
+      <option name="closed" value="true" />
+      <created>1727345479778</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1727345479778</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Integrated prediction model and output">
+      <option name="closed" value="true" />
+      <created>1727502254919</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1727502254919</updated>
+    </task>
+    <task id="LOCAL-00006" summary="A much more accurate model added">
+      <option name="closed" value="true" />
+      <created>1727546876809</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1727546876809</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -212,9 +253,12 @@
     <MESSAGE value="2nd Commit Test" />
     <MESSAGE value="Changed to bootstrap" />
     <MESSAGE value="Added Bootstrap files" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added Bootstrap files" />
+    <MESSAGE value="Added Predict Sale Price Page and form for prediction." />
+    <MESSAGE value="Integrated prediction model and output" />
+    <MESSAGE value="A much more accurate model added" />
+    <option name="LAST_COMMIT_MESSAGE" value="A much more accurate model added" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/PF_Project$PF_Project.coverage" NAME="PF_Project Coverage Results" MODIFIED="1727332440368" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/PF_Project$PF_Project.coverage" NAME="PF_Project Coverage Results" MODIFIED="1728557374709" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

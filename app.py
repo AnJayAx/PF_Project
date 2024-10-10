@@ -387,7 +387,7 @@ def prediction():
 @app.route('/prediction', methods=['POST'])
 def predict():
     data = request.json  # Get the data from the AJAX request
-    print("Received data:", data)
+    # print("Received data:", data)
 
     # Extract values
     month_year = data.get("month_year")
@@ -427,21 +427,79 @@ def predict():
             'nearest_distance_to_mrt': result['nearest_distance_to_mrt'],
             'month_numeric': convert_to_months_since_base(month_year),
         }
-
-        print("Output", output)
+        print("Output:", output)
+        # print("Output", output)
         predicted_price = predicting(output)
         print("Predicted: ", predicted_price)
     else:
         print('No matching data found')
-
     # Return the predicted price as JSON
     return jsonify({"predicted_price": predicted_price})
+
+
+@app.route('/get_historical_data', methods=['POST'])
+def get_historical_data():
+    data = request.json
+    town = data.get("town")
+    block = data.get("block")
+    street_name = data.get("street")
+    flat_type = data.get("flat_type")
+    storey_range = int(data.get("storey_range"))
+    predicted_price = data.get("predicted_price")
+    month_year = data.get("month_year")
+
+    # Filter the DataFrame to find matching historical records
+    historical_data = df[
+        (df['town'] == town) &
+        (df['block'] == block) &
+        (df['street_name'] == street_name) &
+        (df['flat_type'] == flat_type) &
+        (df['storey_range'] == storey_range)
+    ]
+
+    # Extract month and resale price information
+    historical_prices = historical_data[['month', 'resale_price']].dropna()
+
+    # Create a list of years and prices
+    year_price_pairs = historical_prices.groupby('month')['resale_price'].mean().reset_index()
+
+    # If there's a predicted price, append it
+    if predicted_price and month_year:
+        # Ensure the predicted_price is not a list
+        if isinstance(predicted_price, list):
+            predicted_price = predicted_price[0]  # Flatten if it's a list
+
+        # Create a new DataFrame with the predicted price and month_year
+        new_row = pd.DataFrame({
+            'month': [month_year],
+            'resale_price': [predicted_price]
+        })
+
+        # Concatenate the new row with the existing year_price_pairs DataFrame
+        year_price_pairs = pd.concat([year_price_pairs, new_row], ignore_index=True)
+
+    # Flatten the prices to ensure they are not lists of lists
+    flat_prices = []
+    for price in year_price_pairs['resale_price']:
+        if isinstance(price, list):  # Check if the price is a list
+            flat_prices.append(price[0])  # Extract the first element if it's a list
+        else:
+            flat_prices.append(price)  # Otherwise, just append the price as-is
+
+    # Prepare the output
+    output = {
+        'years': year_price_pairs['month'].tolist(),
+        'prices': flat_prices  # Use the flattened prices
+    }
+
+    print(output)
+    return jsonify(output)
 
 # Define your function to convert 'year-month' to months since the base year
 def convert_to_months_since_base(year_month, base_year=1960):
     year, month = map(int, year_month.split('-'))
     months_since_base = (year - base_year) * 12 + month
-    print(months_since_base)
+    # print(months_since_base)
     return months_since_base
 
 def predicting(input_dict):
@@ -451,7 +509,7 @@ def predicting(input_dict):
     scaler_X = joblib.load(path + '/static/prediction/scaler_X.pkl')  # Load feature scaler
     scaler_y = joblib.load(path + '/static/prediction/scaler_y.pkl')  # Load target scaler
 
-    print(input_dict)
+    # print(input_dict)
     # Create a DataFrame from the input
     input_df = pd.DataFrame([input_dict])
 
@@ -459,7 +517,7 @@ def predicting(input_dict):
     for col in label_encoders.keys():
         if col in input_df.columns:
             le = label_encoders[col]  # Get the correct mapping for the column
-            print(len(le.keys()))
+            # print(len(le.keys()))
             # Check if the input value is valid for the LabelEncoder
             if input_dict[col] not in le.keys():
                 print(f"Warning: '{input_dict[col]}' is not a recognized value for '{col}'.")
@@ -491,9 +549,6 @@ def get_streets(town, block):
 def get_flats(block, street):
     flat_types = df[(df['block'] == block) & (df['street_name'] == street)]['flat_type'].unique().tolist()
     return jsonify({'flat_types': flat_types})
-
-
-
 
 if __name__ == '__main__':
     #app.run(debug=True, use_reloader=True)

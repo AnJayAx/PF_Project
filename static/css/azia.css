@@ -11175,7 +11175,7 @@ body {
       width: 290px; } }
   @media (min-width: 992px) {
     .chartjs-wrapper-demo {
-      height: 300px; } }
+      height: auto; } }
 
 .chartist-wrapper-demo {
   height: 200px; }
