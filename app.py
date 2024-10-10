@@ -257,6 +257,12 @@ def get_data():
     # Convert the sliced data to a list of dictionaries (records)
     data_to_send = paginated_data.to_dict(orient='records')
 
+    # damn date formatting bug
+    # try:
+    #     df_to_use['month'] = df_to_use['month'].dt.strftime('%Y-%m')
+    # except:
+    #     print("no wonkiness this time")
+
     response = {
         'draw': draw,
         'recordsTotal': total_records,  # Total number of records
@@ -279,7 +285,6 @@ def filter_data():
     print(data)
     global df_filtered
     df_filtered = df_api_data
-    
     # DF Cols:
     # _id,month,town,flat_type,block,street_name,storey_range,
     # floor_area_sqm,flat_model,lease_commence_date,resale_price,
@@ -288,7 +293,9 @@ def filter_data():
     #print(df_filtered.dtypes)
     for key, value in data.items():
         # Handle the monath
-        if key == "month":
+        if key == "sort":
+            continue
+        elif key == "month":
             frods = value.get("from", "")
             tods = value.get("to", "")
 
@@ -296,10 +303,16 @@ def filter_data():
                 from_val = pd.to_datetime(frods, format='%B %Y', errors='coerce') 
                 to_val = pd.to_datetime(tods, format='%B %Y', errors='coerce') 
 
-                df_filtered[key] = pd.to_datetime(df_filtered[key], format='%Y-%m', errors='coerce')
-                df_filtered = df_filtered.dropna(subset=[key])
-                df_filtered = df_filtered[(df_filtered[key] >= from_val) & (df_filtered[key] <= to_val)]
-                df_filtered[key] = df_filtered[key].dt.strftime('%Y-%m') # Convert back to formmated for front-end
+                if from_val < to_val:
+                    df_filtered[key] = pd.to_datetime(df_filtered[key], format='%Y-%m', errors='coerce')
+                    df_filtered = df_filtered.dropna(subset=[key])
+                    df_temp = df_filtered[(df_filtered[key] >= from_val) & (df_filtered[key] <= to_val)]
+                    if not df_temp.empty:
+                        df_filtered = df_temp
+                    df_filtered[key] = df_filtered[key].dt.strftime('%Y-%m') # Convert back to formmated for front-end
+                else:
+                    # invalid date range...
+                    continue
         else:
             # Handle range queries
             if "from" in value:
@@ -309,23 +322,41 @@ def filter_data():
                 if from_val and to_val:  # Both from and to are specified
                     df_filtered[key] = pd.to_numeric(df_filtered[key], errors='coerce')
                     df_filtered = df_filtered.dropna(subset=[key])
-                    df_filtered = df_filtered[(df_filtered[key] >= float(from_val)) & (df_filtered[key] <= float(to_val))]
+                    df_temp = df_filtered[(df_filtered[key] >= float(from_val)) & (df_filtered[key] <= float(to_val))]
+                    if not df_temp.empty:
+                        df_filtered = df_temp
                 elif from_val:  # Only 'from' specified
                     df_filtered[key] = pd.to_numeric(df_filtered[key], errors='coerce')
                     df_filtered = df_filtered.dropna(subset=[key])
-                    df_filtered = df_filtered[df_filtered[key] >= float(from_val)]
+                    df_temp = df_filtered[df_filtered[key] >= float(from_val)]
+                    if not df_temp.empty:
+                        df_filtered = df_temp
                 elif to_val:  # Only 'to' specified
                     df_filtered[key] = pd.to_numeric(df_filtered[key], errors='coerce')
                     df_filtered = df_filtered.dropna(subset=[key])
-                    df_filtered = df_filtered[df_filtered[key] <= float(to_val)]
+                    df_temp = df_filtered[df_filtered[key] <= float(to_val)]
+                    if not df_temp.empty:
+                        df_filtered = df_temp
         
             # Handle exact matches for strings
             elif isinstance(value, str) and value.strip() != "":
-                df_filtered = df_filtered[df_filtered[key] == value.upper()]
+                df_temp = df_filtered[df_filtered[key] == value.upper()]
+                if not df_temp.empty:
+                    df_filtered = df_temp
+
+    if data["sort"]["sortBy"] != "":
+        col = data["sort"]["sortBy"]
+        if int(data["sort"]["order"]):
+            #True = asc, False = desc
+            order = True 
+        else:
+            order = False
+        df_filtered = df_filtered.sort_values(by=col, ascending=order)
 
     # If no results are found, they use the api data. Should show some message about there not being any results.
-    print(df_filtered)
-    #df_filtered['month'] = df_filtered['month'].dt.strftime('%Y-%m')
+    #print(df_filtered['month'])
+    df_filtered['month'] = pd.to_datetime(df_filtered['month'], format='%Y-%m', errors='coerce')
+    df_filtered['month'] = df_filtered['month'].dt.strftime('%Y-%m')
 
     return jsonify({"success": True}), 200
 

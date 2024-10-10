@@ -137,7 +137,7 @@
           </div> <!-- Col-->
         </div> <!-- Row -->
 
-        <div class="row row-sm wd-600">
+        <div class="row row-sm mg-y-20 wd-600">
           <div class="col-lg">
             <p class="mg-b-10">Lease Commencement Date</p>
             <input disabled id="lease-date-input" class="form-control" placeholder="Enter a year" type="text">
@@ -155,6 +155,36 @@
             </div> <!-- Row for Years and Months-->
           </div> <!-- Col-->
         </div> <!-- Row -->
+
+        <!-- Sort By -->
+        <div class="row row-sm">
+          <div class="col-lg-2">
+            <p class="mg-b-10">Sort By</p>
+            <select id="sort-by-input" class="form-control select2">
+              <option label="Choose one"></option>
+              <option value="month">Month</option>
+              <option value="floor_area_sqm">Floor Area</option>
+              <option value="resale_price">Resale Price</option>
+              <option value="price_per_sq_metre">Price per metre square</option>
+              <option value="remaining_lease">Remaining Lease</option>
+            </select>
+          </div> <!-- Col -->
+            <div class="row mg-t-40">
+              <div class="col-lg-5">
+                <label class="rdiobox">
+                  <input name="sort-order" type="radio" value="1" class="rdio">
+                  <span>Ascending</span>
+                </label>
+              </div><!-- col-3 -->
+              <div class="col-lg-5">
+                <label class="rdiobox">
+                  <input name="sort-order" type="radio" value="0" class="rdio" checked>
+                  <span>Descending</span>
+                </label>
+              </div><!-- col-3 -->
+            </div><!-- row -->
+        </div> <!-- Row -->
+
         <!-- Action Buttons-->
         <div class="row row-sm mg-y-20">
           <div class="text-right ml-auto"><button id="reset-filters" class="btn btn-secondary">Reset All
@@ -217,17 +247,19 @@
 <script>
   // Datepicker
   $('.fc-datepicker').datepicker({
-    minDate: new Date(1990, 1 - 1, 1), // doesnt work... grrr
     showOtherMonths: true,
     selectOtherMonths: true,
     changeMonth: true,
     changeYear: true,
     showButtonPanel: true,
     dateFormat: 'MM yy',
+    // minDate: "01 90",
+    maxDate: 0,
     onClose: function (dateText, inst) {
       $(this).datepicker('setDate', new Date(inst.selectedYear, inst.selectedMonth, 1));
     }
   });
+
 
   var $d1 = $('#price-range-input')
   var $d2 = $('#price-per-metre-range-input')
@@ -322,8 +354,12 @@
       }
 
       // Reset placeholders for select class
-      $('#town-input').val(null)
-      $('#flat-type-input').val(null)
+      $('#town-input').val('').trigger('change')
+      $('#flat-type-input').val('').trigger('change')
+      $('#sort-by-input').val('').trigger('change')
+
+      // Radiobuttons
+      $(".rdio").prop('checked', true);
 
       // Reset the annoying ionrangesliders
       var d1_instance = $d1.data('ionRangeSlider')
@@ -386,6 +422,10 @@
         "years": $('#remlease-years-input').val(),
         "months": $('#remlease-months-input').val()
       }
+      sort = {
+        sortBy: document.getElementById("sort-by-input").value,
+        order: document.querySelector('input[name="sort-order"]:checked').value
+      }
       town = document.getElementById("town-input").value
       flat_type = document.getElementById("flat-type-input").value
       street_name = document.getElementById("street-name-input").value
@@ -396,6 +436,7 @@
       // # floor_area_sqm,flat_model,lease_commence_date,resale_price,
       // # remaining_lease,price_per_sq_metre,f_resale_price,f_price_per_sq_metre
       data = {
+        sort: sort,
         month: date,
         floor_area_sqm: floor_area,
         resale_price: resale_price,
@@ -418,10 +459,12 @@
         success: function (response) {
           if (response.success) {
             console.log("Success! ", response.data);
-
+            window.scrollTo({ left: 0, top: document.body.scrollHeight, behavior: "smooth" });
+            
             var table = $('#main-table').DataTable();
             table.destroy();
             $('#main-table').DataTable({
+              "ordering": false,
               "processing": true,
               "serverSide": true,
               "ajax": {
