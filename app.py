@@ -98,6 +98,8 @@ def fetch_data_from_api():
                     df_api_data['month'] = pd.to_datetime(df_api_data['month'], format='%Y-%m', errors='coerce')
                     df_api_data = df_api_data.sort_values(by='month', ascending=False)
                     df_api_data['month'] = df_api_data['month'].dt.strftime('%Y-%m')
+                    df_api_data['month'] = df_api_data['month'].astype(str)
+                    print(df_api_data['month'].head())
 
                     socketio.emit('data_ready', {'message': 'Data is ready!'})
 
@@ -242,26 +244,15 @@ def get_data():
     # Uses older data into the table until api data is fully retrieved. Then use that.
     if not df_api_data.empty:
         df_to_use = df_api_data
+        print("using API data")
     
     if not df_filtered.empty:
         df_to_use = df_filtered
-        
         print("using filtered data")
 
-    # Total number of records in the DataFrame
     total_records = len(df_to_use)
-
-    # Slice the DataFrame based on pagination parameters
     paginated_data = df_to_use.iloc[start:start + length]
-
-    # Convert the sliced data to a list of dictionaries (records)
     data_to_send = paginated_data.to_dict(orient='records')
-
-    # damn date formatting bug
-    # try:
-    #     df_to_use['month'] = df_to_use['month'].dt.strftime('%Y-%m')
-    # except:
-    #     print("no wonkiness this time")
 
     response = {
         'draw': draw,
@@ -284,7 +275,7 @@ def filter_data():
     print("Data received is as such: ")
     print(data)
     global df_filtered
-    df_filtered = df_api_data
+    df_filtered = df_api_data.copy(deep=True)
     # DF Cols:
     # _id,month,town,flat_type,block,street_name,storey_range,
     # floor_area_sqm,flat_model,lease_commence_date,resale_price,
@@ -355,23 +346,10 @@ def filter_data():
 
     # If no results are found, they use the api data. Should show some message about there not being any results.
     #print(df_filtered['month'])
-    df_filtered['month'] = pd.to_datetime(df_filtered['month'], format='%Y-%m', errors='coerce')
-    df_filtered['month'] = df_filtered['month'].dt.strftime('%Y-%m')
-
     return jsonify({"success": True}), 200
 
 @app.route('/search-hdb', methods=['GET', 'POST'])
 def search_hdb():
-    #print(df_api_data.columns)
-    #data = df_api_data[['month', 'town', 'flat_type', 'block', 'street_name', 'storey_range', 'floor_area_sqm', 'lease_commence_date', 'resale_price', 'f_resale_price', 'f_price_per_sq_metre']].to_dict(orient='records')
-    # Filters required:
-    # (DateTimePicker) - Date Range from Start to End, 
-    # (Range Slider) - Price Range, 
-    # (Single Select Box w/wo Search) - Flat Type(Rooms), Town
-    # ---------------------------------------
-    # RMB TO-DO:
-    # hover over table headers to see what they mean
-    # responsivity of the table could be better
     return render_template('search-hdb.html', title='index', user=current_user)
 
 # Load the CSV data into a global variable to avoid reloading
