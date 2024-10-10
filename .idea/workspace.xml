@@ -4,14 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3b583d00-72f2-4aca-88d9-62ddda72b3ab" name="Changes" comment="A much more accurate model added">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="3b583d00-72f2-4aca-88d9-62ddda72b3ab" name="Changes" comment="Added Output section for Prediction">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app.py" beforeDir="false" afterPath="$PROJECT_DIR$/app.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/css/azia.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/azia.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/csv/ResaleFlatPrices.csv" beforeDir="false" afterPath="$PROJECT_DIR$/static/csv/ResaleFlatPrices.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/prediction/resale_model_updated.h5" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dash_dashboard.py" beforeDir="false" afterPath="$PROJECT_DIR$/dash_dashboard.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/prediction.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/prediction.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -181,7 +178,7 @@
       <workItem from="1727945352116" duration="603000" />
       <workItem from="1728391122278" duration="1475000" />
       <workItem from="1728473945431" duration="16207000" />
-      <workItem from="1728535982326" duration="17318000" />
+      <workItem from="1728535982326" duration="22798000" />
     </task>
     <task id="LOCAL-00001" summary="2nd Commit Test">
       <option name="closed" value="true" />
@@ -231,7 +228,15 @@
       <option name="project" value="LOCAL" />
       <updated>1727546876809</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="Added Output section for Prediction">
+      <option name="closed" value="true" />
+      <created>1728561870185</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1728561870185</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -256,9 +261,10 @@
     <MESSAGE value="Added Predict Sale Price Page and form for prediction." />
     <MESSAGE value="Integrated prediction model and output" />
     <MESSAGE value="A much more accurate model added" />
-    <option name="LAST_COMMIT_MESSAGE" value="A much more accurate model added" />
+    <MESSAGE value="Added Output section for Prediction" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added Output section for Prediction" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/PF_Project$PF_Project.coverage" NAME="PF_Project Coverage Results" MODIFIED="1728557374709" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/PF_Project$PF_Project.coverage" NAME="PF_Project Coverage Results" MODIFIED="1728567646774" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

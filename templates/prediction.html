@@ -337,26 +337,25 @@
     </script>
     <script>
         $(document).ready(function () {
-            // Initialize Select2 for elements with or without search
             $('.select2').select2({
                 placeholder: 'Choose one',
                 searchInputPlaceholder: 'Search',
-                width: '100%' // Ensure Select2 takes up 100% width
+                width: '100%'
             });
 
             $('.select2-no-search').select2({
                 minimumResultsForSearch: Infinity,
                 placeholder: 'Choose one',
-                width: '100%' // Ensure Select2 takes up 100% width
+                width: '100%'
             });
 
-            // Initialize datepicker with month and year only
-            const myDate = new Date();  // Use the current date by default
+
+            const myDate = new Date();
             $('#datetimepicker').datepicker({
-                dateFormat: 'MM yy', // Show only month and year
-                changeMonth: true,   // Enable month dropdown
-                changeYear: true,    // Enable year dropdown
-                showButtonPanel: true, // Show Today and Done buttons
+                dateFormat: 'MM yy',
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
                 autoclose: true,
                 minDate: 0,
                 onClose: function (dateText, inst) {
@@ -364,17 +363,14 @@
                     const month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
                     const year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
 
-                    // Add leading zero to month if needed
                     const formattedMonth = (parseInt(month) + 1).toString().padStart(2, '0');
 
-                    // Create the desired format 'YYYY-MM'
                     const formattedDate = `${year}-${formattedMonth}`;
 
-                    // Set the formatted date in the input field
                     $(this).val(formattedDate);
                 },
                 beforeShow: function (input, inst) {
-                    $(inst.dpDiv).addClass('month-year-picker'); // Add custom class
+                    $(inst.dpDiv).addClass('month-year-picker');
                 }
             });
 
@@ -394,12 +390,12 @@
         }
 
         .input-section {
-            width: 49%; /* Input section takes slightly less than half of the width */
+            width: 49%;
         }
 
         .output-section {
-            width: 45%; /* Set width for output section */
-            border: 1px solid gray; /* Gray border */
+            width: 45%;
+            border: 1px solid gray;
             text-align: center;
             padding: 10px;
             display: none;
@@ -411,17 +407,14 @@
             text-align: left;
         }
 
-        /* Make input fields and button stretch to full width */
         .full-width {
             width: 100%;
         }
 
-        /* Submit button styling */
         .submit-btn {
             height: 40px;
         }
 
-        /* Output section text styling */
         .price-prediction {
             border: 1px solid gray;
             padding: 20px;
@@ -430,32 +423,27 @@
             font-weight: bold;
         }
 
-        /* Chart / Info boxes */
         .chart-box {
             border: 1px solid gray;
             padding: 20px;
             margin: 10px 0;
         }
 
-        /* Reduced gap between input and output sections */
         .d-flex {
             display: flex;
             justify-content: space-between;
             gap: 10px;
         }
 
-        /* Hide the calendar */
         .ui-datepicker-calendar {
             display: none;
         }
 
-        /* General datepicker style */
         .month-year-picker {
             width: auto;
             padding: 10px;
         }
 
-        /* Styling for the dropdowns */
         .ui-datepicker .ui-datepicker-title {
             display: flex;
             justify-content: center;
@@ -463,7 +451,6 @@
             gap: 10px; /* Space between dropdowns */
         }
 
-        /* Styling for the previous and next arrows */
         .ui-datepicker .ui-datepicker-prev,
         .ui-datepicker .ui-datepicker-next {
             top: 0; /* Align arrows vertically with the dropdowns */
@@ -508,8 +495,6 @@
         .ui-datepicker-buttonpane button:hover {
             background-color: #0056b3;
         }
-
-
     </style>
 
 {% endblock %}

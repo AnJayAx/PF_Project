@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, redirect, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, login_required, logout_user, current_user, LoginManager
 from flask_socketio import SocketIO, emit
-from dash_dashboard import dash_app
 import requests
 import locale
 import re
@@ -16,6 +15,7 @@ locale.setlocale(locale.LC_ALL, '')
 import time
 import joblib
 from tensorflow.keras.models import load_model
+import dash
 from dash_dashboard import dash_app
 
 app = Flask(__name__)

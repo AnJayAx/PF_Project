@@ -67,13 +67,13 @@ year_options = [{"label": str(year), "value": year} for year in unique_years]
 year_options.append({"label": "2019-2024", "value": "2019-2024"})  # Add the range option
 
 # Create the Dash app
-dash_app = dash.Dash(__name__, server=False, url_base_pathname='/dashboard/')
+dash_app = dash.Dash(__name__, url_base_pathname='/dash/')
 
 # Define the layout with five visualizations
-dash_app.layout = html.Div([
-    html.H1("HDB Resale Dashboard"),
+dash_app.layout = html.Div(children=[
+    html.H1(children="HDB Resale Dashboard"),
 
-  
+
     # First Visualization (Price Trend Over Time)
     html.H4('How prices are moving'),
 
@@ -84,7 +84,7 @@ dash_app.layout = html.Div([
         value=None,
         placeholder="Select a Town"
     ),
-    
+
     # Dropdown for selecting a flat type (hidden until a town is selected)
     dcc.Dropdown(
         id="flat-type-dropdown",
@@ -93,7 +93,7 @@ dash_app.layout = html.Div([
         placeholder="Select a Flat Type",
         style={'display': 'none'}  # Hidden by default
     ),
-    
+
     # Dropdown for selecting a street (hidden until a flat type is selected)
     dcc.Dropdown(
         id="street-dropdown",
@@ -102,7 +102,7 @@ dash_app.layout = html.Div([
         placeholder="Select a Street (optional)",
         style={'display': 'none'}  # Hidden by default
     ),
-    
+
     # Dropdown for selecting a block (hidden until a street is selected)
     dcc.Dropdown(
         id="block-dropdown",
@@ -111,13 +111,13 @@ dash_app.layout = html.Div([
         placeholder="Select a Block (optional)",
         style={'display': 'none'}  # Hidden by default
     ),
-    
+
     # Line chart for displaying the price trend
     dcc.Graph(id="price-trend-chart"),
 
     # Second Visualization (Town Rankings)
     html.H4('Top 5 Cheapest Towns with Drill-down to Streets'),
-    
+
     # Dropdown for selecting the flat type
     dcc.Dropdown(
         id="flat-type-dropdown5",
@@ -125,7 +125,7 @@ dash_app.layout = html.Div([
         value="5 ROOM",  # Default to "5 ROOM"
         clearable=False,
     ),
-    
+
     # Dropdown for selecting the metric (resale price, price per sqm, price per year)
     dcc.Dropdown(
         id="metric-dropdown5",
@@ -137,7 +137,7 @@ dash_app.layout = html.Div([
         value="resale_price",  # Default to showing the resale price
         clearable=False,
     ),
-    
+
     dcc.Graph(id="bar-chart5"),
 
     # Reset button to go back to town-level view
@@ -155,7 +155,7 @@ dash_app.layout = html.Div([
         value=max(unique_years),  # Default to the most recent year
         clearable=False,
     ),
-    
+
     # Multi-select dropdown for selecting towns to display
     dcc.Dropdown(
         id="town-dropdown3",
@@ -164,7 +164,7 @@ dash_app.layout = html.Div([
         multi=True,  # Allow multiple town selection
         placeholder="Select towns to display (leave empty for all towns)",
     ),
-    
+
     # The treemap chart
     dcc.Graph(id="treemap-chart"),
 
@@ -184,7 +184,7 @@ dash_app.layout = html.Div([
         value="5 ROOM",  # Default to "5 ROOM"
         clearable=False,
     ),
-    
+
     # Multi-select dropdown for selecting towns to display
     dcc.Dropdown(
         id="town-dropdown4",
@@ -193,7 +193,7 @@ dash_app.layout = html.Div([
         multi=True,  # Allow multiple town selection
         placeholder="Select towns to display (leave empty for all towns)",
     ),
-    
+
     dcc.Graph(id="slope-chart2"),
 
     # Fifth Visualization (Top 5 Affordable Towns)
@@ -205,7 +205,7 @@ dash_app.layout = html.Div([
         clearable=False,
         style={'width': '50%'}
     ),
-    
+
     dcc.Dropdown(
         id="dropdown",
         options=[
@@ -218,7 +218,6 @@ dash_app.layout = html.Div([
         style={'width': '50%'}
     ),
     dcc.Graph(id="bar-chart"),  # New graph for Top 5 Towns
-    
 ])
 
 # Callback for updating the first graph (Price Trend Over Time)
