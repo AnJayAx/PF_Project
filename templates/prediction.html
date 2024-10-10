@@ -23,8 +23,7 @@
                                         <i class="typcn typcn-calendar-outline tx-24 lh--9 op-6"></i>
                                     </div>
                                 </div>
-                                <input type="text" data-date="{{ date.strftime("%m/%y") }}" id="datetimepicker"
-                                       class="form-control" required>
+                                <input type="text" data-date="{{ date }}" id="datetimepicker" class="form-control" required>
                             </div>
                         </div>
 
@@ -78,17 +77,17 @@
                     <div class="output-section" id="result-box">
                         <div class="user-inputs">
                             <div class="input-box-predict">
-                                <h5>Town: <span id="display-town"></span></h5>
-                                <h5>Block: <span id="display-block"></span></h5>
-                                <h5>Street Name: <span id="display-street"></span></h5>
-                                <h5>Flat Type: <span id="display-flat_type"></span></h5>
-                                <h5>Storey Range: <span id="display-storey_range"></span></h5>
+                                <h5>Town: <span id="display-town" style="color: #1a058e"></span></h5>
+                                <h5>Block: <span id="display-block" style="color: #1a058e"></span></h5>
+                                <h5>Street Name: <span id="display-street" style="color: #1a058e"></span></h5>
+                                <h5>Flat Type: <span id="display-flat_type" style="color: #1a058e"></span></h5>
+                                <h5>Storey Range: <span id="display-storey_range" style="color: #1a058e"></span></h5>
                             </div>
                         </div>
                         <div id="price-prediction" class="price-prediction">
                             <!-- Predicted price will be inserted here -->
-                            <h3>Predicted Price for <span id="target-year-month"></span></h3>
-                            <h3><span id="predicted-price">$XX,XXX</span></h3>
+                            <h5>Predicted Price for <span id="target-year-month"></span></h5>
+                            <h3><b><span id="predicted-price">$XX,XXX</span></b></h3>
                         </div>
 
                         <!-- Additional charts or information boxes -->
@@ -99,9 +98,9 @@
                                 <canvas id="chartLine1"></canvas>
                             </div>
                         </div>
-                        <div class="chart-box">
-                            <h5>Chart or Info Box 2</h5>
-                        </div>
+{#                        <div class="chart-box">#}
+{#                            <h5>Chart or Info Box 2</h5>#}
+{#                        </div>#}
                     </div>
                 </div>
             </div><!-- az-content-body -->
@@ -350,32 +349,30 @@
             });
 
 
-            const myDate = new Date();
             $('#datetimepicker').datepicker({
-                dateFormat: 'MM yy',
+                dateFormat: 'yy-mm',  // Ensure the date format is set to YYYY-MM
                 changeMonth: true,
                 changeYear: true,
                 showButtonPanel: true,
                 autoclose: true,
                 minDate: 0,
+                beforeShow: function (input, inst) {
+                    $(inst.dpDiv).addClass('month-year-picker');
+                },
                 onClose: function (dateText, inst) {
                     // Get selected month and year
                     const month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
                     const year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
-
                     const formattedMonth = (parseInt(month) + 1).toString().padStart(2, '0');
-
                     const formattedDate = `${year}-${formattedMonth}`;
-
                     $(this).val(formattedDate);
-                },
-                beforeShow: function (input, inst) {
-                    $(inst.dpDiv).addClass('month-year-picker');
                 }
             });
 
-            // Set the initial date to current date
-            $('#datetimepicker').datepicker('setDate', myDate);
+            // Set the initial date to the value from the data-date attribute
+            const initialDate = $('#datetimepicker').data('date');
+            console.log("Initial Date from data attribute:", initialDate);  // Debug log
+            $('#datetimepicker').datepicker('setDate', new Date(initialDate + "-01"));  // Set it to the parsed date
 
         });
     </script>
@@ -404,6 +401,7 @@
         .user-inputs {
             border: 1px solid gray;
             margin-bottom: 10px;
+            padding: 10px;
             text-align: left;
         }
 

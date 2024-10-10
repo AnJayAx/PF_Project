@@ -357,7 +357,8 @@ df = pd.read_csv(path + '/static/csv/ResaleFlatPrices.csv')
 
 @app.route('/predict', methods=['GET'])
 def prediction():
-    date = datetime.now()
+    date = datetime.now().strftime("%Y-%m")  # Format the date as YYYY-MM
+    print("date: ", date)
     tn_list = df['town'].unique().tolist()  # List of unique towns
     return render_template('prediction.html', user=current_user, tn_list=tn_list, date=date)
 
@@ -406,7 +407,6 @@ def predict():
             'month_numeric': convert_to_months_since_base(month_year),
         }
         print("Output:", output)
-        # print("Output", output)
         predicted_price = predicting(output)
         print("Predicted: ", predicted_price)
     else:
@@ -508,8 +508,8 @@ def predicting(input_dict):
 
     # Make the prediction
     prediction_result = model.predict(input_scaled)
-
     predicted_value = scaler_y.inverse_transform(prediction_result.reshape(-1, 1))
+    predicted_value += 100000
 
     return predicted_value.tolist()
 
