@@ -454,7 +454,6 @@
         storey_range: storey
       }
 
-
       $.ajax({
         url: "/filter-data",
         type: "POST",
@@ -523,7 +522,6 @@
     })
 
 
-
     var socket = io.connect('http://' + document.domain + ':' + location.port);
 
     socket.on('data_ready', function (msg) {
@@ -575,6 +573,12 @@
       $('#loading').hide();
       $('#main-table').show();
     });
+
+    // Auto display user's town area if logged in
+    {% if user.is_authenticated %}
+      $('#town-input').val("{{ user.district }}").trigger('change');
+      $('#apply-filters').click();
+    {% endif %}
 
   });
 

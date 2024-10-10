@@ -41,6 +41,8 @@ class Users(db.Model, UserMixin):
     username = db.Column(db.String(20), nullable=False)
     email = db.Column(db.String(70), nullable=False, unique=True)
     password = db.Column(db.String(45), nullable=False)
+    postal = db.Column(db.String(6), nullable=False)
+    district = db.Column(db.String(45), nullable=False)
 
 path = os.getcwd()
 
@@ -77,7 +79,7 @@ def fetch_data_from_api():
                 j["f_price_per_sq_metre"] = locale.currency(float(j["price_per_sq_metre"]), grouping=True)
 
             table_data_chunks.extend(records)
-            
+
             try:
                 print(data["result"]["offset"] > data["result"]["total"])
                 if data["result"]["offset"] > data["result"]["total"]:
@@ -181,41 +183,61 @@ def register():
         email = request.form["email"]
         password = request.form["password"]
         password2 = request.form["password2"]
+        postal = request.form["postal"]
 
         def validate_form():
             email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-            password_regex = r'^(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{7,}$'
+            password_regex = r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$'
             email_valid = False
             password_valid = False
             user = Users.query.filter_by(email=email).first()
 
             # check for invalid email, password
-            if re.match(email_regex, email):
-                if user:
-                    flash("Email is invalid! ", category='error')
-                else:
-                    email_valid = True
-
-                if password == password2:
-                    # Check if password meets the criteria
-                    if re.match(password_regex, password):
-                        password_valid = True
+            if int(postal[:2]) in range(1, 81):
+                if re.match(email_regex, email):
+                    if user:
+                        flash("Email is taken! ", category='error')
                     else:
-                        flash(
-                            "Password is invalid. It must contain at least 8 characters, including letters and numbers!",
-                            category='error')
+                        email_valid = True
+
+                    if password == password2:
+                        # Check if password meets the criteria
+                        if re.match(password_regex, password):
+                            password_valid = True
+                        else:
+                            flash(
+                                "Password is invalid. It must contain at least 8 characters, including letters, numbers and one special character!",
+                                category='error')
+                    else:
+                        flash("Passwords do not match! ", category='error')
                 else:
-                    flash("Passwords do not match! ", category='error')
+                    flash("Email is invalid!", category='error')
             else:
-                flash("Email is invalid!", category='error')
+                flash("Postal Code is invalid!", category='error')
 
-            return email_valid and password_valid
+            return email_valid, password_valid
 
+
+        # Function to check if a postal code matches any entry in the "Postal Code" column
+        def check_postal_code(postal_code_input):
+            # Iterate over each row in the DataFrame
+            excel_data = pd.read_csv('postal_code_information.csv')
+
+            for index, row in excel_data.iterrows():
+                postal_codes = str(row['Postal Code']).split(', ')
+                if postal_code_input in postal_codes:
+                    area = row['Area']
+                    print(area)
+                    return area
+
+
+        email_valid, password_valid = validate_form()
         # validate if all fields are correct
-        if validate_form():
+        if email_valid and password_valid:
+            district = check_postal_code(postal[:2])
             # commit new user details to DB
             new_user = Users(id=userid, username=username, email=email,
-                             password=generate_password_hash(password, method='pbkdf2:sha256'))
+                             password=generate_password_hash(password, method='pbkdf2:sha256'), postal=postal, district=district)
             db.session.add(new_user)
             db.session.commit()
             flash("Account has been created!", category='success')
@@ -245,7 +267,7 @@ def get_data():
     if not df_api_data.empty:
         df_to_use = df_api_data
         print("using API data")
-    
+
     if not df_filtered.empty:
         df_to_use = df_filtered
         print("using filtered data")
@@ -339,7 +361,7 @@ def filter_data():
         col = data["sort"]["sortBy"]
         if int(data["sort"]["order"]):
             #True = asc, False = desc
-            order = True 
+            order = True
         else:
             order = False
         df_filtered = df_filtered.sort_values(by=col, ascending=order)
