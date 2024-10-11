@@ -193,7 +193,8 @@ def register():
             user = Users.query.filter_by(email=email).first()
 
             # check for invalid email, password
-            if int(postal[:2]) in range(1, 81):
+            if int(postal[:2]) in range(1, 83):
+                print(postal[:2])
                 if re.match(email_regex, email):
                     if user:
                         flash("Email is taken! ", category='error')
