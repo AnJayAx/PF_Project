@@ -81,7 +81,7 @@ def fetch_data_from_api():
             table_data_chunks.extend(records)
 
             try:
-                print(data["result"]["offset"] > data["result"]["total"])
+                print("Loading API...")
                 if data["result"]["offset"] > data["result"]["total"]:
                     completeAPICall = True
                     end = time.time()
@@ -101,11 +101,10 @@ def fetch_data_from_api():
                     df_api_data = df_api_data.sort_values(by='month', ascending=False)
                     df_api_data['month'] = df_api_data['month'].dt.strftime('%Y-%m')
                     df_api_data['month'] = df_api_data['month'].astype(str)
-                    print(df_api_data['month'].head())
 
                     socketio.emit('data_ready', {'message': 'Data is ready!'})
 
-                    print("Loop End ++++++")
+                    print("Load Complete ++++++")
                     print("Time Taken for full API call: " + str(time_taken))
             except:
                 print("Fetching data from API...")
@@ -267,11 +266,11 @@ def get_data():
     # Uses older data into the table until api data is fully retrieved. Then use that.
     if not df_api_data.empty:
         df_to_use = df_api_data
-        print("using API data")
+        #print("using API data")
 
     if not df_filtered.empty:
         df_to_use = df_filtered
-        print("using filtered data")
+        #print("using filtered data")
 
     total_records = len(df_to_use)
     paginated_data = df_to_use.iloc[start:start + length]
@@ -295,8 +294,8 @@ def reset_filters():
 @app.route('/filter-data', methods=['POST'])
 def filter_data():
     data = request.json
-    print("Data received is as such: ")
-    print(data)
+    # print("Data received is as such: ")
+    # print(data)
     global df_filtered
     df_filtered = df_api_data.copy(deep=True)
     # DF Cols:
