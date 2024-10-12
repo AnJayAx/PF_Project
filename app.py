@@ -379,18 +379,19 @@ df = pd.read_csv(path + '/static/csv/ResaleFlatPrices.csv')
 
 @app.route('/predict', methods=['GET'])
 def prediction():
-    date = datetime.now().strftime("%Y-%m")  # Format the date as YYYY-MM
-    print("date: ", date)
-    tn_list = df['town'].unique().tolist()  # List of unique towns
+    date = datetime.now().strftime("%Y-%m")
+    # print("date: ", date)
+    tn_list = df['town'].unique().tolist()
     return render_template('prediction.html', user=current_user, tn_list=tn_list, date=date)
 
 # Route to handle prediction
 @app.route('/prediction', methods=['POST'])
 def predict():
-    data = request.json  # Get the data from the AJAX request
+    data = request.json
     # print("Received data:", data)
 
     # Extract values
+    model = data.get("model")
     month_year = data.get("month_year")
     town = data.get("town")
     block = data.get("block")
@@ -409,11 +410,12 @@ def predict():
     predicted_price = 0
     # Check if we found a matching row
     if not filtered_df.empty:
-        # Extract the first matching row (you can handle multiple matches if necessary)
+        # Extract the first matching row
         result = filtered_df.iloc[0]
 
         # Prepare the data to return to the front-end
         output = {
+            'month': convert_to_months_since_base(month_year),
             'town': town,
             'flat_type': result['flat_type'],
             'block': block,
@@ -426,11 +428,10 @@ def predict():
             'year_completed': result['year_completed'],
             'nearest_mrt': result['nearest_mrt'],
             'nearest_distance_to_mrt': result['nearest_distance_to_mrt'],
-            'month_numeric': convert_to_months_since_base(month_year),
         }
-        print("Output:", output)
-        predicted_price = predicting(output)
-        print("Predicted: ", predicted_price)
+
+        predicted_price = predicting(output, model)
+        print("Predicted: ", predicted_price[0][0])
     else:
         print('No matching data found')
     # Return the predicted price as JSON
@@ -467,7 +468,7 @@ def get_historical_data():
     if predicted_price and month_year:
         # Ensure the predicted_price is not a list
         if isinstance(predicted_price, list):
-            predicted_price = predicted_price[0]  # Flatten if it's a list
+            predicted_price = predicted_price[0]
 
         # Create a new DataFrame with the predicted price and month_year
         new_row = pd.DataFrame({
@@ -481,33 +482,43 @@ def get_historical_data():
     # Flatten the prices to ensure they are not lists of lists
     flat_prices = []
     for price in year_price_pairs['resale_price']:
-        if isinstance(price, list):  # Check if the price is a list
-            flat_prices.append(price[0])  # Extract the first element if it's a list
+        if isinstance(price, list):
+            flat_prices.append(price[0])
         else:
-            flat_prices.append(price)  # Otherwise, just append the price as-is
+            flat_prices.append(price)
 
     # Prepare the output
     output = {
         'years': year_price_pairs['month'].tolist(),
-        'prices': flat_prices  # Use the flattened prices
+        'prices': flat_prices
     }
 
-    print(output)
     return jsonify(output)
 
-# Define your function to convert 'year-month' to months since the base year
+# Convert 'year-month' to months since the base year
 def convert_to_months_since_base(year_month, base_year=1960):
     year, month = map(int, year_month.split('-'))
     months_since_base = (year - base_year) * 12 + month
     # print(months_since_base)
     return months_since_base
 
-def predicting(input_dict):
+def predicting(input_dict, model_selected):
     # Load the models and scalers
-    model = load_model(path + '/static/prediction/resale_model_adjusted.h5')
-    label_encoders = joblib.load(path + '/static/prediction/label_encoders.pkl')  # Load label encoders
-    scaler_X = joblib.load(path + '/static/prediction/scaler_X.pkl')  # Load feature scaler
-    scaler_y = joblib.load(path + '/static/prediction/scaler_y.pkl')  # Load target scaler
+    if model_selected == "DT":
+        model = joblib.load(path + '/static/prediction/decisiontree_model_DT.h5')
+    elif model_selected == "HGB":
+        model = joblib.load(path + '/static/prediction/histgradientboosting_model.h5')
+    elif model_selected == "XGB":
+        model = joblib.load(path + '/static/prediction/xgboost_model.h5')
+    elif model_selected == "LSTM":
+        model = load_model(path + '/static/prediction/lstm_model.h5')
+    elif model_selected == "NN":
+        model = load_model(path + '/static/prediction/nn_model_best.h5')
+    else:
+        model = load_model(path + '/static/prediction/decisiontree_model_DT.h5')
+    label_encoders = joblib.load(path + '/static/prediction/label_encoders.pkl')
+    scaler_X = joblib.load(path + '/static/prediction/scaler_X.pkl')
+    scaler_y = joblib.load(path + '/static/prediction/scaler_y.pkl')
 
     # print(input_dict)
     # Create a DataFrame from the input
@@ -516,7 +527,7 @@ def predicting(input_dict):
     # Map categorical columns using the loaded encoders
     for col in label_encoders.keys():
         if col in input_df.columns:
-            le = label_encoders[col]  # Get the correct mapping for the column
+            le = label_encoders[col]
             # print(len(le.keys()))
             # Check if the input value is valid for the LabelEncoder
             if input_dict[col] not in le.keys():
@@ -528,16 +539,38 @@ def predicting(input_dict):
     # Scale the input
     input_scaled = scaler_X.transform(input_df)
 
-    # Make the prediction
-    prediction_result = model.predict(input_scaled)
-    predicted_value = scaler_y.inverse_transform(prediction_result.reshape(-1, 1))
-    predicted_value += 100000
+    if model_selected == "LSTM":
+        # Reshape the input data for LSTM
+        timesteps = 1
+        n_features = input_scaled.shape[1]
+        new_flat_scaled_reshaped = input_scaled.reshape((1, timesteps, n_features))
+
+        # Make the prediction
+        prediction_result = model.predict(new_flat_scaled_reshaped)
+        predicted_value = scaler_y.inverse_transform(prediction_result.reshape(-1, 1))
+        print("Predicting using LSTM...")
+    elif model_selected == "DT":
+        prediction_result = model.predict(input_scaled)
+        predicted_value = scaler_y.inverse_transform(prediction_result.reshape(-1, 1))
+        print("Predicting using DT...")
+    elif model_selected == "HGB":
+        prediction_result = model.predict(input_scaled)
+        predicted_value = scaler_y.inverse_transform(prediction_result.reshape(-1, 1))
+        print("Predicting using HGB...")
+    elif model_selected == "XGB":
+        prediction_result = model.predict(input_scaled)
+        predicted_value = scaler_y.inverse_transform(prediction_result.reshape(-1, 1))
+        print("Predicting using XGB...")
+    elif model_selected == "NN":
+        prediction_result = model.predict(input_scaled)
+        predicted_value = scaler_y.inverse_transform(prediction_result.reshape(-1, 1))
+        print("Predicting using NN...")
 
     return predicted_value.tolist()
 
 @app.route('/get_blocks/<town>', methods=['GET'])
 def get_blocks(town):
-    blocks = df[df['town'] == town]['block'].unique().tolist()  # Get unique blocks for the selected town
+    blocks = df[df['town'] == town]['block'].unique().tolist()
     return jsonify({'blocks': blocks})
 
 @app.route('/get_streets/<town>/<block>', methods=['GET'])
