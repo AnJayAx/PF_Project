@@ -372,7 +372,10 @@ def filter_data():
 
 @app.route('/search-hdb', methods=['GET', 'POST'])
 def search_hdb():
-    return render_template('search-hdb.html', title='index', user=current_user)
+    hideActionButtons = False
+    if df_api_data.empty:
+        hideActionButtons = True
+    return render_template('search-hdb.html', title='index', user=current_user, hideActionButtons=hideActionButtons)
 
 # Load the CSV data into a global variable to avoid reloading
 df = pd.read_csv(path + '/static/csv/ResaleFlatPrices.csv')
