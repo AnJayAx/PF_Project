@@ -92,7 +92,7 @@ def fetch_data_from_api():
                     if '_id' in df_api_data.columns:
                         start_id = df_api_data['_id'].max() + 1
                     else:
-                        start_id = 1  # If JSON has no IDs, start from 1
+                        start_id = 1
                     df_older_data['_id'] = range(start_id, start_id + len(df_older_data))                    
                     df_api_data = pd.concat([df_api_data, df_older_data], ignore_index=True, sort=False)
 
@@ -259,7 +259,7 @@ def get_data():
     # Get request parameters from Datatables
     draw = request.args.get('draw')  # For keeping track of requests
     start = int(request.args.get('start', 0))  # Starting index
-    length = int(request.args.get('length', 20))  # Number of rows per page
+    length = int(request.args.get('length', 15))  # Number of rows per page
     df_to_use = df_older_data
     #print(df_to_use)
 
@@ -372,7 +372,10 @@ def filter_data():
 
 @app.route('/search-hdb', methods=['GET', 'POST'])
 def search_hdb():
-    return render_template('search-hdb.html', title='index', user=current_user)
+    hideActionButtons = False
+    if df_api_data.empty:
+        hideActionButtons = True
+    return render_template('search-hdb.html', title='index', user=current_user, hideActionButtons=hideActionButtons)
 
 # Load the CSV data into a global variable to avoid reloading
 df = pd.read_csv(path + '/static/csv/ResaleFlatPrices.csv')
