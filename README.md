@@ -8,4 +8,6 @@ pip install joblib\
 pip install pandas\
 pip install flask-socketio\
 pip install dash\
+pip install xgboost\
+
 Run via terminal command: python -m flask --debug  run
