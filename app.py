@@ -35,7 +35,7 @@ app.config[
     "SQLALCHEMY_DATABASE_URI"] = f"mysql+mysqldb://root:{PASSWORD}@{PUBLIC_IP_ADDRESS}:3306/{DBNAME}?unix_socket=/cloudsql/{PROJECT_ID}:{INSTANCE_NAME}"
 db = SQLAlchemy(app)
 
-
+# Each attribute in the class represents a column in the table, and the data types of these attributes define the type of data that each column will hold
 class Users(db.Model, UserMixin):
     id = db.Column(db.String(255), primary_key=True, nullable=False)
     username = db.Column(db.String(20), nullable=False)
@@ -145,13 +145,20 @@ def main():  # put application's code here
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # redirects user to home page if already logged in
     if current_user.is_authenticated:
         return redirect("/")
+
+    # onclick of submit button
     if request.method == 'POST':
+        # attributes from login form
         email = request.form["email"]
         pwd = request.form["password"]
+
+        # query to find user from email address
         user = Users.query.filter_by(email=email).first()
 
+        # function to check password against form password & database password derived from user email
         def login_credentials():
             if user:
                 if check_password_hash(user.password, pwd):
@@ -173,8 +180,11 @@ def login():
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
+    # redirects user to home page if already logged in
     if current_user.is_authenticated:
         return redirect("/")
+
+    # onclick of submit button
     if request.method == 'POST':
         # attributes from register form
         userid = str(uuid4())
@@ -184,6 +194,7 @@ def register():
         password2 = request.form["password2"]
         postal = request.form["postal"]
 
+        # function to validate all fields in form
         def validate_form():
             email_regex = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
             password_regex = r'^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$'
@@ -191,17 +202,21 @@ def register():
             password_valid = False
             user = Users.query.filter_by(email=email).first()
 
-            # check for invalid email, password
+            # check for valid postal code
             if int(postal[:2]) in range(1, 83):
-                print(postal[:2])
+
+                # check if email meets the regex criteria
                 if re.match(email_regex, email):
+                    # check for taken email
                     if user:
                         flash("Email is taken! ", category='error')
                     else:
                         email_valid = True
 
+                    # check for password match
                     if password == password2:
-                        # Check if password meets the criteria
+
+                        # check if password meets the regex criteria
                         if re.match(password_regex, password):
                             password_valid = True
                         else:
@@ -218,23 +233,23 @@ def register():
             return email_valid, password_valid
 
 
-        # Function to check if a postal code matches any entry in the "Postal Code" column
+        # function to check if a postal code matches entry in the "Postal Code" column
         def check_postal_code(postal_code_input):
-            # Iterate over each row in the DataFrame
             excel_data = pd.read_csv('postal_code_information.csv')
 
+            # iterate over each row in the file
             for index, row in excel_data.iterrows():
                 postal_codes = str(row['Postal Code']).split(', ')
                 if postal_code_input in postal_codes:
                     area = row['Area']
-                    print(area)
                     return area
 
-
-        email_valid, password_valid = validate_form()
         # validate if all fields are correct
+        email_valid, password_valid = validate_form()
+
         if email_valid and password_valid:
             district = check_postal_code(postal[:2])
+
             # commit new user details to DB
             new_user = Users(id=userid, username=username, email=email,
                              password=generate_password_hash(password, method='pbkdf2:sha256'), postal=postal, district=district)
